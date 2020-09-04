@@ -51,11 +51,23 @@ rm(alltables,page, url, xpath,country,links,link) # removing clutter
 table <- table[which(table$country!="Independent Olympic Athletes"),]
 
 table$country_de <- countrycode(table$country,'country.name','country.name.de')
+    # custom name changes
+    table$country_de[which(table$country_de=="Korea, Demokratische Volksrepublik")] <- "Nordkorea"
+    table$country_de[which(table$country_de=="Korea, Republik von")] <- "Südkorea"
+    table$country_de[which(table$country_de=="Russische Föderation")] <- "Russland"
 
 # Data for graph functions
 table$link <- paste0("https://en.wikipedia.org/wiki/",table$link)
 
 table$onclick <- sprintf("window.open(\"%s%s\")","",table$link)
+
+# German links
+table$link_de <- paste0("https://de.wikipedia.org/wiki/Olympische_Sommerspiele_2016/Teilnehmer_(",
+                        table$country_de,
+                        ")") %>%
+    gsub(" ","_",.)
+
+table$onclick_de <- sprintf("window.open(\"%s%s\")","",table$link_de)
 
 
 # Reshape for graph
@@ -64,7 +76,15 @@ table <- pivot_longer(table,
                        names_to = "medal",
                        values_to = "count")
 
-table$medal <- factor(table$medal, labels = c("Gold","Silver","Bronze"))
+# Values for tooltip
+tiptab <- pivot_wider(table[,c("country","medal","count")],
+                      id_cols = c("country","medal"),
+                      names_from = "medal",
+                      values_from = "count")
+
+# Merging
+table <- merge(table,tiptab,by = "country")
+    rm(tiptab)
 
 
 # Graph
@@ -73,13 +93,17 @@ table$medal <- factor(table$medal, labels = c("Gold","Silver","Bronze"))
 tooltip_css <- "background-color:gray;color:white;padding:10px;border-radius:5px;font-family: Lora, sans-serif;font-weight:lighter;font-size:12px;"
 
 
-p <- ggplot(table, aes(x=reorder(c_abbrev,-Total),
+p <- ggplot(table, aes(x=reorder(c_abbrev,Total),
                   y=count, fill = medal)) +
     geom_bar_interactive(position="stack", stat="identity",
-                         aes(tooltip = paste0("Land: ",country_de,"\n",
-                                              "Gesamtzahl Medaillen: ",Total,"\n\n",
+                         aes(tooltip = paste0("Land: ",country_de,"\n\n",
+                                              "Gesamtzahl Medaillen: ",Total,"\n",
+                                              "Gold: ",Gold,"\n",
+                                              "Silber: ",Silver,"\n",
+                                              "Bronze: ",Bronze,"\n\n",
                                               "Für weitere Informationen bitte auf den Balken klicken."),
-                             onclick = onclick)) +
+                             onclick = onclick_de)) +
+    coord_flip() +
     xlab("") +
     ylab("") +
     scale_y_continuous(expand = c(0, 0), limits = c(0, 125)) +
@@ -87,11 +111,11 @@ p <- ggplot(table, aes(x=reorder(c_abbrev,-Total),
     scale_fill_brewer(palette = "Reds") +
     theme(legend.position = "bottom",
           legend.title = element_blank(),
-          axis.text.x = element_text(size = 6,angle = 25,hjust = 1,vjust = 1))
+          axis.text.y = element_text(size = 4))
 
 girafe(ggobj = p,
        fonts=list(sans = "Arial"),
         options = list(
-          opts_tooltip(offx = 10, offy = 10,css = tooltip_css),
+          opts_tooltip(offx = 10, offy = 10,css = tooltip_css,use_cursor_pos = TRUE),
           opts_toolbar(saveaspng = FALSE)))
 
