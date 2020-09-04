@@ -17,13 +17,13 @@ page <- read_html(url)
 # Extracting table
 alltables <- html_nodes(page, "table")
 
-table <- alltables[[2]] %>% 
+table <- alltables[[2]] %>%
     html_table(fill = T)
 
 # Cleaning
 table <- table[which(grepl("Totals", table$NOC)!=TRUE),]
 
-table <- table %>% 
+table <- table %>%
     separate(NOC,
              c("country","c_abbrev"),
              sep = -6)
@@ -118,4 +118,3 @@ girafe(ggobj = p,
         options = list(
           opts_tooltip(offx = 10, offy = 10,css = tooltip_css,use_cursor_pos = TRUE),
           opts_toolbar(saveaspng = FALSE)))
-
