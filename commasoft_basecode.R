@@ -69,10 +69,12 @@ table$link_de <- paste0("https://de.wikipedia.org/wiki/Olympische_Sommerspiele_2
 
 table$onclick_de <- sprintf("window.open(\"%s%s\")","",table$link_de)
 
+# adjust medal names
+names(table)[names(table)=="Silver"] <- "Silber"
 
 # Reshape for graph
 table <- pivot_longer(table,
-                       cols = c("Gold","Silver","Bronze"),
+                       cols = c("Gold","Silber","Bronze"),
                        names_to = "medal",
                        values_to = "count")
 
@@ -85,21 +87,32 @@ tiptab <- pivot_wider(table[,c("country","medal","count")],
 # Merging
 table <- merge(table,tiptab,by = "country")
     rm(tiptab)
+    
+# Factor for graph
+table$medfac <- NA
+table$medfac[table$medal=="Bronze"] <- 1
+table$medfac[table$medal=="Silber"] <- 2
+table$medfac[table$medal=="Gold"] <- 3
+table$medfac <- factor(table$medfac,
+                       levels = c(1,2,3),
+                       labels = c("Bronze","Silber","Gold"))
 
+# Order table
+table <- table[order(table$country,-table$medfac),]
 
 # Graph
 #######
-
 tooltip_css <- "background-color:gray;color:white;padding:10px;border-radius:5px;font-family: Lora, sans-serif;font-weight:lighter;font-size:12px;"
 
 
-p <- ggplot(table, aes(x=reorder(c_abbrev,Total),
-                  y=count, fill = medal)) +
-    geom_bar_interactive(position="stack", stat="identity",
-                         aes(tooltip = paste0("Land: ",country_de,"\n\n",
+# Plot
+p <- ggplot(table[1:(3*84),], aes(x=reorder(c_abbrev,Total),
+                  y=count, fill = medfac)) +
+    geom_bar_interactive(position="stack", stat="identity",color = "gray", size=.05,
+                         aes(tooltip = paste0("<strong>",country_de,"</strong>\n\n",
                                               "Gesamtzahl Medaillen: ",Total,"\n",
                                               "Gold: ",Gold,"\n",
-                                              "Silber: ",Silver,"\n",
+                                              "Silber: ",Silber,"\n",
                                               "Bronze: ",Bronze,"\n\n",
                                               "Für weitere Informationen bitte auf den Balken klicken."),
                              onclick = onclick_de)) +
@@ -107,11 +120,15 @@ p <- ggplot(table, aes(x=reorder(c_abbrev,Total),
     xlab("") +
     ylab("") +
     scale_y_continuous(expand = c(0, 0), limits = c(0, 125)) +
+    scale_fill_manual(values = c("#fc8d59","#91bfdb","#ffffbf"),
+                      guide = guide_legend(reverse = TRUE)) +
     theme_bw() +
-    scale_fill_brewer(palette = "Reds") +
     theme(legend.position = "bottom",
           legend.title = element_blank(),
-          axis.text.y = element_text(size = 4))
+          axis.text.y = element_text(size = 4),
+          axis.text.x = element_text(size = 6),
+          panel.grid.major.x = element_line(color = "gray", size = .2),
+          panel.grid.major.y = element_blank())
 
 girafe(ggobj = p,
        fonts=list(sans = "Arial"),
