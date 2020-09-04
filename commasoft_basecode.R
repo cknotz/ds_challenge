@@ -76,7 +76,15 @@ table <- pivot_longer(table,
                        names_to = "medal",
                        values_to = "count")
 
-#table$medal <- factor(table$medal, labels = c("Gold","Silver","Bronze"))
+# Values for tooltip
+tiptab <- pivot_wider(table[,c("country","medal","count")],
+                      id_cols = c("country","medal"),
+                      names_from = "medal",
+                      values_from = "count")
+
+# Merging
+table <- merge(table,tiptab,by = "country")
+    rm(tiptab)
 
 
 # Graph
@@ -88,10 +96,11 @@ tooltip_css <- "background-color:gray;color:white;padding:10px;border-radius:5px
 p <- ggplot(table, aes(x=reorder(c_abbrev,Total),
                   y=count, fill = medal)) +
     geom_bar_interactive(position="stack", stat="identity",
-                         aes(tooltip = paste0("Land: ",country_de,"\n",
+                         aes(tooltip = paste0("Land: ",country_de,"\n\n",
                                               "Gesamtzahl Medaillen: ",Total,"\n",
-                                              #"Gold: ",count[which(medal=="Gold")],"\n",
-                                              "\n\n",
+                                              "Gold: ",Gold,"\n",
+                                              "Silber: ",Silver,"\n",
+                                              "Bronze: ",Bronze,"\n\n",
                                               "Für weitere Informationen bitte auf den Balken klicken."),
                              onclick = onclick_de)) +
     coord_flip() +
