@@ -9,6 +9,10 @@ library(tidyverse)
 library(ggiraph)
 library(countrycode)
 
+
+# Number of medals
+##################
+
 # Downloading website
 url <- "https://en.wikipedia.org/wiki/2016_Summer_Olympics_medal_table"
 xpath <- "/html/body/div[3]/div[3]/div[5]/div[1]/table[2]"
@@ -38,7 +42,7 @@ html_attr("href")
 country <- gsub("/wiki/|_at_the_2016_Summer_Olympics", "", link)
 country <- gsub("_", " ", country)
 links <- data.frame(country,link)
-links <- links[which(grepl("Summer Olympic|Winter Olympic",links$country)!=TRUE),]
+links <- links[which(grepl("Summer Olympic|Winter Olympic|Independent Olympic Athletes",links$country)!=TRUE),]
 links$link <- gsub("/wiki/", "",links$link)
 
 # # Merge
@@ -48,8 +52,6 @@ table <- merge(table,links,
 rm(alltables,page, url, xpath,country,links,link) # removing clutter
 
 # Cleaning & translating country names
-table <- table[which(table$country!="Independent Olympic Athletes"),]
-
 table$country_de <- countrycode(table$country,'country.name','country.name.de')
     # custom name changes
     table$country_de[which(table$country_de=="Korea, Demokratische Volksrepublik")] <- "Nordkorea"
@@ -97,8 +99,31 @@ table$medfac <- factor(table$medfac,
                        levels = c(1,2,3),
                        labels = c("Bronze","Silber","Gold"))
 
-# Order table
-table <- table[order(table$country,-table$medfac),]
+
+# Number of athletes
+####################
+url <- "https://en.wikipedia.org/wiki/2016_Summer_Olympics#Number_of_athletes_by_National_Olympic_Committee"
+
+# Fetching page
+athletes <- url %>% 
+    read_html() %>% 
+    html_nodes(xpath = "/html/body/div[3]/div[3]/div[5]/div[1]/table[5]", 
+               #css = "table.wikitable:nth-child(101)"
+               ) %>% 
+    #html_table(fill=T)
+    html_text()
+
+ath <- strsplit(athletes, "\n")[[1]]
+
+
+
+
+
+# Order dataset
+table <- table[order(-table$Total,table$country,-table$medfac),]
+
+# Save as backup
+saveRDS(table,file = "backup.rds")
 
 # Graph
 #######
@@ -120,7 +145,7 @@ p <- ggplot(table[1:(3*84),], aes(x=reorder(c_abbrev,Total),
     xlab("") +
     ylab("") +
     scale_y_continuous(expand = c(0, 0), limits = c(0, 125)) +
-    scale_fill_manual(values = c("#fc8d59","#91bfdb","#ffffbf"),
+    scale_fill_manual(values = c("#d95f0e","#a6cee3","#fff7bc"),
                       guide = guide_legend(reverse = TRUE)) +
     theme_bw() +
     theme(legend.position = "bottom",
@@ -128,7 +153,9 @@ p <- ggplot(table[1:(3*84),], aes(x=reorder(c_abbrev,Total),
           axis.text.y = element_text(size = 4),
           axis.text.x = element_text(size = 6),
           panel.grid.major.x = element_line(color = "gray", size = .2),
-          panel.grid.major.y = element_blank())
+          panel.grid.major.y = element_blank(),
+          legend.key.size = unit(.75,"line"),
+          legend.text = element_text(size = 6))
 
 girafe(ggobj = p,
        fonts=list(sans = "Arial"),
