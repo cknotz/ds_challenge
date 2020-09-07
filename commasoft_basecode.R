@@ -195,6 +195,8 @@ table %>% arrange(-no) %>%
     slice_head(n=3*50) %>% 
     ggplot(aes(x=reorder(c_abbrev,no),y=no)) +
     geom_bar(stat = "identity") +
+    ylab("Athleten") +
+    xlab("") +
     coord_flip() +
     theme_bw() +
     theme(legend.position = "bottom",
