@@ -51,12 +51,62 @@ table <- merge(table,links,
 
 rm(alltables,page, url, xpath,country,links,link) # removing clutter
 
+# adjust medal names
+names(table)[names(table)=="Silver"] <- "Silber"
+
+
+# Number of athletes
+####################
+url <- "https://en.wikipedia.org/wiki/2016_Summer_Olympics#Number_of_athletes_by_National_Olympic_Committee"
+
+# Fetching page
+athletes <- url %>% 
+    read_html() %>% 
+    html_nodes(xpath = "/html/body/div[3]/div[3]/div[5]/div[1]/table[5]", 
+               #css = "table.wikitable:nth-child(101)"
+               ) %>% 
+    #html_table(fill=T)
+    html_text() 
+
+athletes <- strsplit(athletes, '\n')[[1]] %>% 
+    as.data.frame() %>% 
+    filter(.!="Participating National Olympic Committees" & .!= "") %>% 
+    rename("entry"= ".")
+
+# Cleaning
+athletes$no <- as.numeric(str_extract(athletes$entry,
+              "(\\d+)"))
+athletes$country <- gsub("\\d|[[:punct:]]",
+                         "",
+                         athletes$entry) %>% 
+    trimws(whitespace = "[\\h\\v]")
+athletes$entry <- NULL
+
+rm(url) #remove clutter 
+
+# Merge & reshape
+#################
+table <- merge(athletes,table,
+               by="country",
+               all.x = T)
+rm(athletes)
+
+
 # Cleaning & translating country names
+table <- filter(table,
+                country!="Refugee Olympic Team" & country!="Independent Olympic Athletes")
+
 table$country_de <- countrycode(table$country,'country.name','country.name.de')
     # custom name changes
+    table$country_de[which(table$country=="Virgin Islands")] <- "Virgin Islands"
     table$country_de[which(table$country_de=="Korea, Demokratische Volksrepublik")] <- "Nordkorea"
     table$country_de[which(table$country_de=="Korea, Republik von")] <- "Südkorea"
     table$country_de[which(table$country_de=="Russische Föderation")] <- "Russland"
+    
+table$c_abbrev <- countrycode(table$country,'country.name','iso3c')
+    # custom names
+    table$c_abbrev[which(table$country=="Kosovo")] <- "XK"
+    table$c_abbrev[which(table$country=="Virgin Islands")] <- "VIR"
 
 # Data for graph functions
 table$link <- paste0("https://en.wikipedia.org/wiki/",table$link)
@@ -71,8 +121,6 @@ table$link_de <- paste0("https://de.wikipedia.org/wiki/Olympische_Sommerspiele_2
 
 table$onclick_de <- sprintf("window.open(\"%s%s\")","",table$link_de)
 
-# adjust medal names
-names(table)[names(table)=="Silver"] <- "Silber"
 
 # Reshape for graph
 table <- pivot_longer(table,
@@ -99,31 +147,8 @@ table$medfac <- factor(table$medfac,
                        levels = c(1,2,3),
                        labels = c("Bronze","Silber","Gold"))
 
-
-# Number of athletes
-####################
-url <- "https://en.wikipedia.org/wiki/2016_Summer_Olympics#Number_of_athletes_by_National_Olympic_Committee"
-
-# Fetching page
-athletes <- url %>% 
-    read_html() %>% 
-    html_nodes(xpath = "/html/body/div[3]/div[3]/div[5]/div[1]/table[5]", 
-               #css = "table.wikitable:nth-child(101)"
-               ) %>% 
-    #html_table(fill=T)
-    html_text()
-
-ath <- strsplit(athletes, "\n")[[1]]
-
-
-
-
-
-# Order dataset
-table <- table[order(-table$Total,table$country,-table$medfac),]
-
 # Save as backup
-saveRDS(table,file = "backup.rds")
+saveRDS(table,file = "www/backup.rds")
 
 # Graph
 #######
@@ -131,7 +156,9 @@ tooltip_css <- "background-color:gray;color:white;padding:10px;border-radius:5px
 
 
 # Plot
-p <- ggplot(table[1:(3*84),], aes(x=reorder(c_abbrev,Total),
+p <- table %>% arrange(-table$Total,table$c_abbrev) %>% 
+    slice_head(n=3*20) %>% 
+    ggplot(aes(x=reorder(c_abbrev,Total),
                   y=count, fill = medfac)) +
     geom_bar_interactive(position="stack", stat="identity",color = "gray", size=.05,
                          aes(tooltip = paste0("<strong>",country_de,"</strong>\n\n",
@@ -162,3 +189,19 @@ girafe(ggobj = p,
         options = list(
           opts_tooltip(offx = 10, offy = 10,css = tooltip_css,use_cursor_pos = TRUE),
           opts_toolbar(saveaspng = FALSE)))
+
+
+table %>% arrange(-no) %>% 
+    slice_head(n=3*50) %>% 
+    ggplot(aes(x=reorder(c_abbrev,no),y=no)) +
+    geom_bar(stat = "identity") +
+    coord_flip() +
+    theme_bw() +
+    theme(legend.position = "bottom",
+          legend.title = element_blank(),
+          axis.text.y = element_text(size = 4),
+          axis.text.x = element_text(size = 6),
+          panel.grid.major.x = element_line(color = "gray", size = .2),
+          panel.grid.major.y = element_blank(),
+          legend.key.size = unit(.75,"line"),
+          legend.text = element_text(size = 6))
