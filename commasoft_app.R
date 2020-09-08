@@ -48,28 +48,31 @@ ui <- dashboardPage(
               fluidRow(
                   tabBox(width = 12, id = "tab1", # title = "Athleten & Medaillen bei den Olympischen Sommerspielen 2016"
                          tabPanel("Athleten pro Land",
+                                  fluidRow(width=NULL,align="center",
                                   sliderInput("n_athletes",
                                               label = "Anzahl Länder",
-                                              min = 10,
+                                              min = 2,
                                               max = 207,
-                                              value = 20,
-                                              step = 1),
+                                              value = 10,
+                                              step = 1)),
                                   girafeOutput("athletes")),
                          tabPanel("Medaillen pro Land",
+                                  fluidRow(width=NULL,align="center",
                                   sliderInput("n_medals",
                                               label = "Anzahl Länder",
-                                              min = 10,
-                                              max = 207,
-                                              value = 20,
-                                              step = 1),
+                                              min = 2,
+                                              max = 84,
+                                              value = 10,
+                                              step = 1)),
                                   girafeOutput("medals")),
                          tabPanel("Bringen mehr Athleten mehr Medaillen?",
+                                  fluidRow(width=NULL,align="center",
                                   pickerInput("medal_select",
                                               label = "Resultat",
-                                              choices = c("Gesamtzahl Medaillen",
-                                                          "Goldmedaillen",
-                                                          "Silbermedaillen",
-                                                          "Bronzemedaillen")),
+                                              choices = c("Gesamtzahl Medaillen" = "Total",
+                                                          "Goldmedaillen" = "Gold",
+                                                          "Silbermedaillen" = "Silber",
+                                                          "Bronzemedaillen" = "Bronze"))),
                                   girafeOutput("scatter"))
                      )
               )),
@@ -81,7 +84,7 @@ ui <- dashboardPage(
           tabItem(tabName = "aufg3",
               fluidRow(
                   box(width = 12,collapsible = T, solidHeader = T,collapsed = T,
-                      title = "Frage 1:"),
+                      title = "Frage 1: "),
                   box(width = 12,collapsible = T,solidHeader = T,collapsed = T,
                       title = "Frage 2: "),
                   box(width = 12,collapsible = T,solidHeader = T,collapsed = T,
@@ -97,7 +100,7 @@ tooltip_css <- "background-color:gray;color:white;padding:10px;border-radius:5px
 ###############
 output$athletes <- renderGirafe({
 p <- table %>% arrange(-no) %>% 
-    slice_head(n=3*50) %>% 
+    slice_head(n=3*input$n_athletes) %>% 
     ggplot(aes(x=reorder(c_abbrev,no),y=no)) +
     geom_bar_interactive(stat = "identity", fill = "#e34a33",
                          aes(tooltip = paste0("<strong>",country_de,"</strong>\n\n",
@@ -110,7 +113,7 @@ p <- table %>% arrange(-no) %>%
     theme_bw() +
     theme(legend.position = "bottom",
           legend.title = element_blank(),
-          axis.text.y = element_text(size = 4),
+          axis.text.y = element_text(size = log(input$n_athletes)), # adapt this
           axis.text.x = element_text(size = 6),
           panel.grid.major.x = element_line(color = "gray", size = .2),
           panel.grid.major.y = element_blank(),
@@ -121,7 +124,8 @@ girafe(ggobj = p,
        fonts=list(sans = "Arial"),
         options = list(
           opts_tooltip(offx = 10, offy = 10,css = tooltip_css,use_cursor_pos = TRUE),
-          opts_toolbar(saveaspng = FALSE)))
+          opts_toolbar(saveaspng = FALSE),
+          opts_zoom(max = 5)))
 }) 
   
 ##### Graph 1.2
@@ -129,7 +133,7 @@ girafe(ggobj = p,
 output$medals <- renderGirafe({
 
 p <- table %>% arrange(-table$Total,table$c_abbrev) %>% 
-    slice_head(n=3*20) %>% 
+    slice_head(n=3*input$n_medals) %>% 
     ggplot(aes(x=reorder(c_abbrev,Total),
                   y=count, fill = medfac)) +
     geom_bar_interactive(position="stack", stat="identity",color = "gray", size=.1,
@@ -160,7 +164,8 @@ girafe(ggobj = p,
        fonts=list(sans = "Arial"),
         options = list(
           opts_tooltip(offx = 10, offy = 10,css = tooltip_css,use_cursor_pos = TRUE),
-          opts_toolbar(saveaspng = FALSE)))
+          opts_toolbar(saveaspng = FALSE),
+          opts_zoom(max = 5)))
 })  
 
 ##### Graph 1.3
@@ -171,16 +176,16 @@ p <- table %>%
     select(country_de,no,Total,onclick_de,c_abbrev,Bronze,Silber,Gold) %>% 
     filter(!is.na(Total)) %>% 
     unique() %>% 
-    ggplot(aes(x=no,y=Silber)) +
+    ggplot(aes(x=no,y=!!sym(input$medal_select))) +
     stat_smooth(color = "gray",alpha = .2,linetype = "dashed",size = .5) +
     geom_point_interactive(color = "#e34a33", alpha = .6,size = 3,
                            aes(data_id = country_de,
                                onclick = onclick_de,
                                tooltip = paste0("<strong>",country_de,"</strong>\n\n",
                                               "Anzahl Athleten: ",no,"\n",
-                                              names(table)[names(table) == "Silber"],": ",Silber,"\n\n",
-                                              "Für weitere Informationen bitte hier klicken."))) +
-    ylab("Gesamtzahl Medaillen") +
+                                              names(table)[names(table) == input$medal_select],": ",!!sym(input$medal_select),"\n\n",
+                                              "Für weitere Informationen bitte auf den Punkt klicken."))) +
+    ylab(names(table)[names(table) == input$medal_select]) +
     xlab("Anzahl Athleten") +
     labs(caption = "Regression via LOESS smoother") +
     theme_bw() +
@@ -200,7 +205,8 @@ girafe(ggobj = p,
           opts_tooltip(offx = 10, offy = 10,css = tooltip_css,use_cursor_pos = TRUE),
           opts_toolbar(saveaspng = FALSE),
           opts_hover_inv(css = "opacity:0.1;"),
-          opts_hover(css = "fill:red;")))
+          opts_hover(css = "fill:red;"),
+          opts_selection(type = "none")))
 })
 
 }
