@@ -48,10 +48,28 @@ ui <- dashboardPage(
               fluidRow(
                   tabBox(width = 12, id = "tab1", # title = "Athleten & Medaillen bei den Olympischen Sommerspielen 2016"
                          tabPanel("Athleten pro Land",
+                                  sliderInput("n_athletes",
+                                              label = "Anzahl Länder",
+                                              min = 10,
+                                              max = 207,
+                                              value = 20,
+                                              step = 1),
                                   girafeOutput("athletes")),
                          tabPanel("Medaillen pro Land",
+                                  sliderInput("n_medals",
+                                              label = "Anzahl Länder",
+                                              min = 10,
+                                              max = 207,
+                                              value = 20,
+                                              step = 1),
                                   girafeOutput("medals")),
                          tabPanel("Bringen mehr Athleten mehr Medaillen?",
+                                  pickerInput("medal_select",
+                                              label = "Resultat",
+                                              choices = c("Gesamtzahl Medaillen",
+                                                          "Goldmedaillen",
+                                                          "Silbermedaillen",
+                                                          "Bronzemedaillen")),
                                   girafeOutput("scatter"))
                      )
               )),
