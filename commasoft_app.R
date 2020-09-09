@@ -17,7 +17,7 @@ ui <- dashboardPage(
       sidebarMenu(
           menuItem("Start", tabName = "start"),
           menuItem("Meine Lösung", tabName = "solu",
-          menuSubItem("Aufgabe 1", tabName = "aufg1"), #, icon = icon("chart-bar", lib = "font-awesome")
+          menuSubItem("Aufgabe 1", tabName = "aufg1", selected = T), #, icon = icon("chart-bar", lib = "font-awesome")
           menuSubItem("Aufgabe 2", tabName = "aufg2"), #, icon = icon("amazon", lib = "font-awesome")
           menuSubItem("Aufgabe 3", tabName = "aufg3")) #, icon = icon("cogs", lib = "font-awesome")
   )),
@@ -100,8 +100,8 @@ tooltip_css <- "background-color:gray;color:white;padding:10px;border-radius:5px
 ##### Graph 1.1
 ###############
 output$athletes <- renderGirafe({
-p <- table %>% arrange(-no) %>% 
-    slice_head(n=3*input$n_athletes) %>% 
+p <- table %>% arrange(-no) %>%
+    slice_head(n=3*input$n_athletes) %>%
     ggplot(aes(x=reorder(c_abbrev,no),y=no)) +
     geom_bar_interactive(stat = "identity", fill = "#e34a33",
                          aes(tooltip = paste0("<strong>",country_de,"</strong>\n\n",
@@ -114,8 +114,8 @@ p <- table %>% arrange(-no) %>%
     theme_bw() +
     theme(legend.position = "bottom",
           legend.title = element_blank(),
-          axis.text.y = element_text(size = 4), # adapt this
-          axis.text.x = element_text(size = 6),
+          axis.text.y = element_text(size = 3), # adapt this
+          axis.text.x = element_text(size = 9),
           panel.grid.major.x = element_line(color = "gray", size = .2),
           panel.grid.major.y = element_blank(),
           legend.key.size = unit(.75,"line"),
@@ -127,14 +127,14 @@ girafe(ggobj = p,
           opts_tooltip(offx = 10, offy = 10,css = tooltip_css,use_cursor_pos = TRUE),
           opts_toolbar(saveaspng = FALSE),
           opts_zoom(max = 5)))
-}) 
-  
+})
+
 ##### Graph 1.2
 ###############
 output$medals <- renderGirafe({
 
-p <- table %>% arrange(-table$Gesamt,table$c_abbrev) %>% 
-    slice_head(n=3*input$n_medals) %>% 
+p <- table %>% arrange(-table$Gesamt,table$c_abbrev) %>%
+    slice_head(n=3*input$n_medals) %>%
     ggplot(aes(x=reorder(c_abbrev,Gesamt),
                   y=count, fill = medfac)) +
     geom_bar_interactive(position="stack", stat="identity",color = "gray", size=.1,
@@ -154,7 +154,7 @@ p <- table %>% arrange(-table$Gesamt,table$c_abbrev) %>%
     theme_bw() +
     theme(legend.position = "bottom",
           legend.title = element_blank(),
-          axis.text.y = element_text(size = 6),
+          #axis.text.y = element_text(size = 6),
           axis.text.x = element_text(size = 6),
           panel.grid.major.x = element_line(color = "gray", size = .2),
           panel.grid.major.y = element_blank(),
@@ -167,7 +167,7 @@ girafe(ggobj = p,
           opts_tooltip(offx = 10, offy = 10,css = tooltip_css,use_cursor_pos = TRUE),
           opts_toolbar(saveaspng = FALSE),
           opts_zoom(max = 5)))
-})  
+})
 
 ##### Graph 1.3
 ###############
