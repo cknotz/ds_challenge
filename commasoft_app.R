@@ -9,6 +9,7 @@ library(tidyverse)
 library(ggiraph)
 
 table <- readRDS("www/backup.rds")
+names(table)[names(table)=="Total"] <- "Gesamt"
 
 ui <- dashboardPage(
   dashboardHeader(title = "Data Science Herausforderung", titleWidth = 300),
@@ -69,7 +70,7 @@ ui <- dashboardPage(
                                   fluidRow(width=NULL,align="center",
                                   pickerInput("medal_select",
                                               label = "Resultat",
-                                              choices = c("Gesamtzahl Medaillen" = "Total",
+                                              choices = c("Gesamtzahl Medaillen" = "Gesamt",
                                                           "Goldmedaillen" = "Gold",
                                                           "Silbermedaillen" = "Silber",
                                                           "Bronzemedaillen" = "Bronze"))),
@@ -113,7 +114,7 @@ p <- table %>% arrange(-no) %>%
     theme_bw() +
     theme(legend.position = "bottom",
           legend.title = element_blank(),
-          axis.text.y = element_text(size = log(input$n_athletes)), # adapt this
+          axis.text.y = element_text(size = 4), # adapt this
           axis.text.x = element_text(size = 6),
           panel.grid.major.x = element_line(color = "gray", size = .2),
           panel.grid.major.y = element_blank(),
@@ -132,13 +133,13 @@ girafe(ggobj = p,
 ###############
 output$medals <- renderGirafe({
 
-p <- table %>% arrange(-table$Total,table$c_abbrev) %>% 
+p <- table %>% arrange(-table$Gesamt,table$c_abbrev) %>% 
     slice_head(n=3*input$n_medals) %>% 
-    ggplot(aes(x=reorder(c_abbrev,Total),
+    ggplot(aes(x=reorder(c_abbrev,Gesamt),
                   y=count, fill = medfac)) +
     geom_bar_interactive(position="stack", stat="identity",color = "gray", size=.1,
                          aes(tooltip = paste0("<strong>",country_de,"</strong>\n\n",
-                                              "Gesamtzahl Medaillen: ",Total,"\n",
+                                              "Gesamtzahl Medaillen: ",Gesamt,"\n",
                                               "Gold: ",Gold,"\n",
                                               "Silber: ",Silber,"\n",
                                               "Bronze: ",Bronze,"\n\n",
@@ -153,7 +154,7 @@ p <- table %>% arrange(-table$Total,table$c_abbrev) %>%
     theme_bw() +
     theme(legend.position = "bottom",
           legend.title = element_blank(),
-          axis.text.y = element_text(size = 4),
+          axis.text.y = element_text(size = 6),
           axis.text.x = element_text(size = 6),
           panel.grid.major.x = element_line(color = "gray", size = .2),
           panel.grid.major.y = element_blank(),
@@ -173,8 +174,8 @@ girafe(ggobj = p,
 output$scatter <- renderGirafe({
 
 p <- table %>% 
-    select(country_de,no,Total,onclick_de,c_abbrev,Bronze,Silber,Gold) %>% 
-    filter(!is.na(Total)) %>% 
+    select(country_de,no,Gesamt,onclick_de,c_abbrev,Bronze,Silber,Gold) %>% 
+    filter(!is.na(Gesamt)) %>% 
     unique() %>% 
     ggplot(aes(x=no,y=!!sym(input$medal_select))) +
     stat_smooth(color = "gray",alpha = .2,linetype = "dashed",size = .5) +
