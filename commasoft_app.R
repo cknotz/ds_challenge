@@ -100,6 +100,8 @@ tooltip_css <- "background-color:gray;color:white;padding:10px;border-radius:5px
 ##### Graph 1.1
 ###############
 output$athletes <- renderGirafe({
+  print(6-0.020*input$n_athletes)
+  
 p <- table %>% arrange(-no) %>%
     slice_head(n=3*input$n_athletes) %>%
     ggplot(aes(x=reorder(c_abbrev,no),y=no)) +
@@ -114,7 +116,7 @@ p <- table %>% arrange(-no) %>%
     theme_bw() +
     theme(legend.position = "bottom",
           legend.title = element_blank(),
-          axis.text.y = element_text(size = 3), # adapt this
+          axis.text.y = element_text(size = 6-0.0225*input$n_athletes ), # adapt this
           axis.text.x = element_text(size = 9),
           panel.grid.major.x = element_line(color = "gray", size = .2),
           panel.grid.major.y = element_blank(),
