@@ -23,6 +23,9 @@ ui <- dashboardPage(
   )),
   dashboardBody(
       shinyDashboardThemes(theme = "flat_red"),
+      tags$style(type="text/css", "text {font-family: sans-serif}"),
+      tags$style(HTML(".js-irs-0 .irs-single, .js-irs-0 .irs-bar-edge, .js-irs-0 .irs-bar {background: #c2224a;border-color: #c2224a;}")),
+      tags$style(HTML(".js-irs-1 .irs-single, .js-irs-1 .irs-bar-edge, .js-irs-1 .irs-bar {background: #c2224a;border-color: #c2224a;}")),
       tabItems(
           tabItem(tabName = "start",
                   fluidRow(
@@ -55,7 +58,8 @@ ui <- dashboardPage(
                                               min = 2,
                                               max = 207,
                                               value = 10,
-                                              step = 1)),
+                                              step = 1,
+                                              ticks = F)),
                                   girafeOutput("athletes")),
                          tabPanel("Medaillen pro Land",
                                   fluidRow(width=NULL,align="center",
@@ -64,7 +68,8 @@ ui <- dashboardPage(
                                               min = 2,
                                               max = 84,
                                               value = 10,
-                                              step = 1)),
+                                              step = 1,
+                                              ticks = F)),
                                   girafeOutput("medals")),
                          tabPanel("Bringen mehr Athleten mehr Medaillen?",
                                   fluidRow(width=NULL,align="center",
@@ -102,8 +107,12 @@ tooltip_css <- "background-color:gray;color:white;padding:10px;border-radius:5px
 output$athletes <- renderGirafe({
   print(6-0.020*input$n_athletes)
   
-p <- table %>% arrange(-no) %>%
-    slice_head(n=3*input$n_athletes) %>%
+p <- table %>% 
+    group_by(country) %>% 
+    slice(1) %>% 
+    ungroup %>% 
+    arrange(-no) %>%
+    slice_head(n=input$n_athletes) %>%
     ggplot(aes(x=reorder(c_abbrev,no),y=no)) +
     geom_bar_interactive(stat = "identity", fill = "#c2224a",
                          aes(tooltip = paste0("<strong>",country_de,"</strong>\n\n",
@@ -113,11 +122,13 @@ p <- table %>% arrange(-no) %>%
     ylab("Athleten") +
     xlab("") +
     coord_flip() +
+    scale_y_continuous(expand = c(0, 0), limits = c(0,610)) +
     theme_bw() +
     theme(legend.position = "bottom",
           legend.title = element_blank(),
           axis.text.y = element_text(size = 6-0.0225*input$n_athletes ), # adapt this
-          axis.text.x = element_text(size = 9),
+          axis.text.x = element_text(size = 8),
+          axis.ticks.y = element_line(size = 0.1),
           panel.grid.major.x = element_line(color = "gray", size = .2),
           panel.grid.major.y = element_blank(),
           legend.key.size = unit(.75,"line"),
@@ -127,7 +138,7 @@ girafe(ggobj = p,
        fonts=list(sans = "Arial"),
         options = list(
           opts_tooltip(offx = 10, offy = 10,css = tooltip_css,use_cursor_pos = TRUE),
-          opts_toolbar(saveaspng = FALSE),
+          opts_toolbar(saveaspng = FALSE,position = "bottomright"),
           opts_zoom(max = 5)))
 })
 
@@ -150,14 +161,15 @@ p <- table %>% arrange(-table$Gesamt,table$c_abbrev) %>%
     coord_flip() +
     xlab("") +
     ylab("") +
-    scale_y_continuous(expand = c(0, 0), limits = c(0, 125)) +
+    scale_y_continuous(expand = c(0, 0), limits = c(0, 130)) +
     scale_fill_manual(values = c("#c2224a50","#c2224a95","#c2224a"),
                       guide = guide_legend(reverse = TRUE)) +
     theme_bw() +
     theme(legend.position = "bottom",
           legend.title = element_blank(),
-          #axis.text.y = element_text(size = 6),
-          axis.text.x = element_text(size = 6),
+          axis.text.y = element_text(size = 6-0.0225*input$n_medals ),
+          axis.text.x = element_text(size = 8),
+          axis.ticks.y = element_line(size = 0.1),
           panel.grid.major.x = element_line(color = "gray", size = .2),
           panel.grid.major.y = element_blank(),
           legend.key.size = unit(.75,"line"),
@@ -194,8 +206,8 @@ p <- table %>%
     theme_bw() +
     theme(legend.position = "bottom",
           legend.title = element_blank(),
-          axis.text.y = element_text(size = 4),
-          axis.text.x = element_text(size = 6),
+          axis.text.y = element_text(size = 8),
+          axis.text.x = element_text(size = 8),
           panel.grid.major.x = element_line(color = "gray", size = .2),
           panel.grid.major.y = element_blank(),
           legend.key.size = unit(.75,"line"),
