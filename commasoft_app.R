@@ -103,7 +103,7 @@ output$athletes <- renderGirafe({
 p <- table %>% arrange(-no) %>%
     slice_head(n=3*input$n_athletes) %>%
     ggplot(aes(x=reorder(c_abbrev,no),y=no)) +
-    geom_bar_interactive(stat = "identity", fill = "#e34a33",
+    geom_bar_interactive(stat = "identity", fill = "#c2224a",
                          aes(tooltip = paste0("<strong>",country_de,"</strong>\n\n",
                                               "Anzahl Athleten: ",no,"\n\n",
                                               "Für weitere Informationen bitte auf den Balken klicken."),
@@ -149,7 +149,7 @@ p <- table %>% arrange(-table$Gesamt,table$c_abbrev) %>%
     xlab("") +
     ylab("") +
     scale_y_continuous(expand = c(0, 0), limits = c(0, 125)) +
-    scale_fill_manual(values = c("#fee8c8","#fdbb84","#e34a33"),
+    scale_fill_manual(values = c("#c2224a50","#c2224a95","#c2224a"),
                       guide = guide_legend(reverse = TRUE)) +
     theme_bw() +
     theme(legend.position = "bottom",
@@ -179,7 +179,7 @@ p <- table %>%
     unique() %>% 
     ggplot(aes(x=no,y=!!sym(input$medal_select))) +
     stat_smooth(color = "gray",alpha = .2,linetype = "dashed",size = .5) +
-    geom_point_interactive(color = "#e34a33", alpha = .6,size = 3,
+    geom_point_interactive(color = "#c2224a", alpha = .6,size = 3,
                            aes(data_id = country_de,
                                onclick = onclick_de,
                                tooltip = paste0("<strong>",country_de,"</strong>\n\n",
