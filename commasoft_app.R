@@ -17,9 +17,9 @@ ui <- dashboardPage(
       sidebarMenu(
           menuItem("Start", tabName = "start"),
           menuItem("Meine Lösung", tabName = "solu",
-          menuSubItem("Aufgabe 1", tabName = "aufg1", selected = T), #, icon = icon("chart-bar", lib = "font-awesome")
+          menuSubItem("Aufgabe 1", tabName = "aufg1"), #, icon = icon("chart-bar", lib = "font-awesome")
           menuSubItem("Aufgabe 2", tabName = "aufg2"), #, icon = icon("amazon", lib = "font-awesome")
-          menuSubItem("Aufgabe 3", tabName = "aufg3")) #, icon = icon("cogs", lib = "font-awesome")
+          menuSubItem("Aufgabe 3", tabName = "aufg3", selected = T)) #, icon = icon("cogs", lib = "font-awesome")
   )),
   dashboardBody(
       shinyDashboardThemes(theme = "flat_red"),
@@ -89,11 +89,20 @@ ui <- dashboardPage(
               )),
           tabItem(tabName = "aufg3",
               fluidRow(
-                  box(width = 12,collapsible = T, solidHeader = T,collapsed = T,
-                      title = "Frage 1: "),
-                  box(width = 12,collapsible = T,solidHeader = T,collapsed = T,
-                      title = "Frage 2: "),
-                  box(width = 12,collapsible = T,solidHeader = T,collapsed = T,
+                  box(width = 12,collapsible = F,solidHeader = T,
+                      title = "Frage 1: Was ist das primäre Ziel für den Einsatz von Predictive Maintenance?",
+                      HTML("<p>Aller Wahrscheinlichkeit nach ist das Ziel, Wartungszeiten zu verkürzen 
+                      (bzw. zu vermeiden, wo diese nicht nötig sind) und daher vorhandenes Equipment optimaler zu nutzen. Andere
+                           Motive sind allerdings auch denkbar (bspw. Unfallschutz oder Qualitätssicherung). Je nach Ziel ändert sich ggf.
+                           auch, welche Gütemaße bei der Bewertungen von Algorithmen angewandt werden müssen. Sollen Wartungen optimiert werden,
+                           spielt die Präzision (die Vermeidung falscher positiver Diagnosen) eine zentrale Rolle; bei der Qualitätssicherung
+                           ist die Vermeidung von falscher negativer Diagnosen (die Sensitivität) wichtiger.</p>")),
+                  box(width = 12,collapsible = F, solidHeader = T,
+                      title = "Frage 2: Wie werden die Maschinen momentan inspiziert?",
+                      HTML("<p>Laut einer Umfrage von PWC verlassen sich viele Betrieben auf visuelle Inspektionen ihrer
+                           Maschinen; relativ wendige wenden schon Instrumentendaten, ggf. auch in real-time, an. In ersterem
+                           Fall müssten zunächst Messinstrumente installiert und systematisch Daten gesammelt werden.</p>")),
+                  box(width = 12,collapsible = F,solidHeader = T,
                       title = "Frage 3: ")
               ))
   ))
@@ -138,7 +147,7 @@ girafe(ggobj = p,
        fonts=list(sans = "Arial"),
         options = list(
           opts_tooltip(offx = 10, offy = 10,css = tooltip_css,use_cursor_pos = TRUE),
-          opts_toolbar(saveaspng = FALSE,position = "bottomright"),
+          opts_toolbar(saveaspng = FALSE,position = "topleft"),
           opts_zoom(max = 5)))
 })
 
@@ -179,7 +188,7 @@ girafe(ggobj = p,
        fonts=list(sans = "Arial"),
         options = list(
           opts_tooltip(offx = 10, offy = 10,css = tooltip_css,use_cursor_pos = TRUE),
-          opts_toolbar(saveaspng = FALSE),
+          opts_toolbar(saveaspng = FALSE,position = "topleft"),
           opts_zoom(max = 5)))
 })
 
@@ -202,7 +211,7 @@ p <- table %>%
                                               "Für weitere Informationen bitte auf den Punkt klicken."))) +
     ylab(names(table)[names(table) == input$medal_select]) +
     xlab("Anzahl Athleten") +
-    labs(caption = "Regression via LOESS smoother") +
+    #labs(caption = "Regression via LOESS smoother") +
     theme_bw() +
     theme(legend.position = "bottom",
           legend.title = element_blank(),
@@ -218,7 +227,7 @@ girafe(ggobj = p,
        fonts=list(sans = "Arial"),
         options = list(
           opts_tooltip(offx = 10, offy = 10,css = tooltip_css,use_cursor_pos = TRUE),
-          opts_toolbar(saveaspng = FALSE),
+          opts_toolbar(saveaspng = FALSE,position = "topleft"),
           opts_hover_inv(css = "opacity:0.1;"),
           opts_hover(css = "fill:red;"),
           opts_selection(type = "none")))
@@ -227,4 +236,4 @@ girafe(ggobj = p,
 }
 
 # Run the application 
-shinyApp(ui = ui, server = server)
+shinyApp(ui, server)
