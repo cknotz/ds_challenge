@@ -12,7 +12,7 @@ table <- readRDS("www/backup.rds")
 names(table)[names(table)=="Total"] <- "Gesamt"
 
 ui <- dashboardPage(
-  dashboardHeader(title = "Data Science Herausforderung", titleWidth = 300),
+  dashboardHeader(title = "Data Science Challenge", titleWidth = 300),
   dashboardSidebar(
       sidebarMenu(
           menuItem("Start", tabName = "start"),
@@ -55,7 +55,7 @@ ui <- dashboardPage(
                                   fluidRow(width=NULL,align="center",
                                   sliderInput("n_athletes",
                                               label = "Anzahl Länder",
-                                              min = 2,
+                                              min = 10,
                                               max = 207,
                                               value = 10,
                                               step = 1,
@@ -65,7 +65,7 @@ ui <- dashboardPage(
                                   fluidRow(width=NULL,align="center",
                                   sliderInput("n_medals",
                                               label = "Anzahl Länder",
-                                              min = 2,
+                                              min = 10,
                                               max = 84,
                                               value = 10,
                                               step = 1,
@@ -114,8 +114,7 @@ tooltip_css <- "background-color:gray;color:white;padding:10px;border-radius:5px
 ##### Graph 1.1
 ###############
 output$athletes <- renderGirafe({
-  print(6-0.020*input$n_athletes)
-  
+
 p <- table %>% 
     group_by(country) %>% 
     slice(1) %>% 
@@ -154,7 +153,7 @@ girafe(ggobj = p,
 ##### Graph 1.2
 ###############
 output$medals <- renderGirafe({
-
+  
 p <- table %>% arrange(-table$Gesamt,table$c_abbrev) %>%
     slice_head(n=3*input$n_medals) %>%
     ggplot(aes(x=reorder(c_abbrev,Gesamt),
