@@ -255,3 +255,33 @@ girafe(ggobj = p,
           opts_hover(css = "fill:red;")))
 
 
+
+# Aufg 3 (Randomization test/Fisher exact test)
+###############################################
+library(EnvStats)
+
+set.seed(42)
+dat1 <- sample(c(rep_len(1,90),rep_len(0,10))) # Anbieter A (100 zufällige Bewertungen, 90% positiv=1)
+dat2 <- c(1,1) # Anbieter B (2 positiv)
+
+perm <- twoSamplePermutationTestProportion(dat1,dat2,
+                                   alternative = "greater")
+perm
+
+
+
+# Simulation
+############
+
+anbA <- rbinom(n=1000000,size=100,prob = 90/100)
+anbB <- rbinom(n=1000000,size =2,prob = 2/2)
+
+diffs <- anbA/100 - anbB/2
+
+hist(diffs)
+
+sum(diffs >=0)/1000000
+
+
+
+

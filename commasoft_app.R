@@ -18,8 +18,8 @@ ui <- dashboardPage(
           menuItem("Start", tabName = "start"),
           menuItem("Meine Lösung", tabName = "solu",
           menuSubItem("Aufgabe 1", tabName = "aufg1"), #, icon = icon("chart-bar", lib = "font-awesome")
-          menuSubItem("Aufgabe 2", tabName = "aufg2"), #, icon = icon("amazon", lib = "font-awesome")
-          menuSubItem("Aufgabe 3", tabName = "aufg3", selected = T)) #, icon = icon("cogs", lib = "font-awesome")
+          menuSubItem("Aufgabe 2", tabName = "aufg2", selected = T)), #, icon = icon("amazon", lib = "font-awesome")
+          menuSubItem("Aufgabe 3", tabName = "aufg3") #, icon = icon("cogs", lib = "font-awesome")
   )),
   dashboardBody(
       shinyDashboardThemes(theme = "flat_red"),
