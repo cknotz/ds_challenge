@@ -260,28 +260,22 @@ girafe(ggobj = p,
 ###############################################
 library(EnvStats)
 
-set.seed(42)
-dat1 <- sample(c(rep_len(1,90),rep_len(0,10))) # Anbieter A (100 zufällige Bewertungen, 90% positiv=1)
-dat2 <- c(1,1) # Anbieter B (2 positiv)
-
-perm <- twoSamplePermutationTestProportion(dat1,dat2,
-                                   alternative = "greater")
-perm
-
-
+fisher.test(rbind(c(90,2),c(10,0)), alternative="less")
 
 # Simulation
 ############
+set.seed(42)
 
 anbA <- rbinom(n=1000000,size=100,prob = 90/100)
 anbB <- rbinom(n=1000000,size =2,prob = 2/2)
 
 diffs <- anbA/100 - anbB/2
 
-hist(diffs)
+plot(density(diffs, bw=.01))
 
-sum(diffs >=0)/1000000
+sum(diffs>0)/1000000
 
+# Less
+(factorial(90+2)*factorial(10+0)*factorial(90+10)*factorial(2+0))/(factorial(90)*factorial(10)*factorial(2)*factorial(0)*factorial(102))
 
-
-
+# Greater

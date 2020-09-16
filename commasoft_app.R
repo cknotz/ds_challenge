@@ -85,7 +85,20 @@ ui <- dashboardPage(
           tabItem(tabName = "aufg2",
               fluidRow(
                   box(width = 12, collapsible = F, solidHeader = T,
-                      title = "Amazon-Kundenbewertungen")
+                      title = "Amazon-Kundenbewertungen",
+                      HTML("<p>Die Aufgabe lässt sich auf zwei Weisen lösen. Eine Möglichkeit ist ein parametrischer Test,
+                       (d.h. ein Test, der auf Annahmen über die Verteilung der Daten in der Grundgesamtheit beruht), die
+                           zweite Möglichkeit ist ein Test mittels einer Simulation.</p>
+                           <p>In ersterem Fall verwendet man den Exakten Test nach Fisher, mit welchen
+                           Differenzen zwischen Stichprobenanteilen auch bei kleinen Stichprobengrößen (wie hier der Fall)
+                           auf ihre Signifikanz hin getestet werden können (die Alternative bei größeren
+                           Stichproben ist der klassische Signifikanztest für Stichprobenanteile basierend auf
+                           der Standardnormalverteilung).</p>
+                           <p>Der Exakte Test nach Fisher wird berechnet als die Wahrscheinlichkeit, die beobachtete oder
+                           eine noch extreme Verteilung zu erhalten unter der Annahme, dass es zwischen der Wahl des Anbieters
+                           und der Kundenzufriedenheit keinen Zusammenhang gibt. Formal wird dies berechnet als:</p>"),
+                      withMathJax("$$p = \\frac{(a+b)!(c+d)!(a+c)!(b+d)!}{(a+b+c+d)!a!b!c!d!}$$")
+                      )
               )),
           tabItem(tabName = "aufg3",
               fluidRow(
