@@ -18,14 +18,18 @@ ui <- dashboardPage(
           menuItem("Start", tabName = "start"),
           menuItem("Meine Lösung", tabName = "solu",
           menuSubItem("Aufgabe 1", tabName = "aufg1"), #, icon = icon("chart-bar", lib = "font-awesome")
-          menuSubItem("Aufgabe 2", tabName = "aufg2", selected = T)), #, icon = icon("amazon", lib = "font-awesome")
-          menuSubItem("Aufgabe 3", tabName = "aufg3") #, icon = icon("cogs", lib = "font-awesome")
+          menuSubItem("Aufgabe 2", tabName = "aufg2", selected = T), #, icon = icon("amazon", lib = "font-awesome")
+          menuSubItem("Aufgabe 3", tabName = "aufg3")) #, icon = icon("cogs", lib = "font-awesome")
   )),
   dashboardBody(
       shinyDashboardThemes(theme = "flat_red"),
       tags$style(type="text/css", "text {font-family: sans-serif}"),
       tags$style(HTML(".js-irs-0 .irs-single, .js-irs-0 .irs-bar-edge, .js-irs-0 .irs-bar {background: #c2224a;border-color: #c2224a;}")),
       tags$style(HTML(".js-irs-1 .irs-single, .js-irs-1 .irs-bar-edge, .js-irs-1 .irs-bar {background: #c2224a;border-color: #c2224a;}")),
+      tags$style(HTML(".js-irs-2 .irs-single, .js-irs-2 .irs-bar-edge, .js-irs-2 .irs-bar {background: #c2224a;border-color: #c2224a;}")),
+      tags$style(HTML(".js-irs-3 .irs-single, .js-irs-3 .irs-bar-edge, .js-irs-3 .irs-bar {background: #c2224a;border-color: #c2224a;}")),
+      tags$style(HTML(".js-irs-4 .irs-single, .js-irs-4 .irs-bar-edge, .js-irs-4 .irs-bar {background: #c2224a;border-color: #c2224a;}")),
+      tags$style(HTML(".js-irs-5 .irs-single, .js-irs-5 .irs-bar-edge, .js-irs-5 .irs-bar {background: #c2224a;border-color: #c2224a;}")),
       tabItems(
           tabItem(tabName = "start",
                   fluidRow(
@@ -86,6 +90,45 @@ ui <- dashboardPage(
               fluidRow(
                   box(width = 12, collapsible = F, solidHeader = T,
                       title = "Amazon-Kundenbewertungen",
+                      column(width = 6,
+                             plotOutput("sim")
+                             ),
+                      column(width = 6,
+                             plotOutput("diff")),
+                      column(width = 6,
+                             h5("Anbieter A"),
+                             sliderInput(inputId = "count_a",
+                                         min = 2,
+                                         max = 500,
+                                         value = 100,
+                                         step = 1,
+                                         ticks = F,
+                                         label = "Anzahl Bewertungen"),
+                             sliderInput(inputId = "pos_a",
+                                         min = 0,
+                                         max = 100,
+                                         step = 1,
+                                         value = 90,
+                                         ticks = F,
+                                         label = "Prozent positiv")
+                             ),
+                      column(width = 6,
+                             h5("Anbieter B"),
+                             sliderInput(inputId = "count_b",
+                                         min = 2,
+                                         max = 500,
+                                         value = 2,
+                                         step = 1,
+                                         ticks = F,
+                                         label = "Anzahl Bewertungen"),
+                             sliderInput(inputId = "pos_b",
+                                         min = 2,
+                                         max = 100,
+                                         step = 5,
+                                         value = 100,
+                                         ticks = F,
+                                         label = "Prozent positiv")
+                             ),
                       HTML("<p>Die Aufgabe lässt sich auf zwei Weisen lösen. Eine Möglichkeit ist ein parametrischer Test,
                        (d.h. ein Test, der auf Annahmen über die Verteilung der Daten in der Grundgesamtheit beruht), die
                            zweite Möglichkeit ist ein Test mittels einer Simulation.</p>
@@ -243,6 +286,61 @@ girafe(ggobj = p,
           opts_hover_inv(css = "opacity:0.1;"),
           opts_hover(css = "fill:red;"),
           opts_selection(type = "none")))
+})
+
+##### Graph 2.1
+###############
+
+output$sim <- renderPlot({
+  set.seed(42)
+  
+  print((input$pos_a/100)*input$count_a)
+  
+  anbA <- rbinom(n=10000,size=input$count_a,prob = ((input$pos_a/100)*input$count_a)/input$count_a)
+  anbB <- rbinom(n=10000,size =input$count_b,prob = ((input$pos_b/100)*input$count_b)/input$count_b)
+  diffs <- anbA/input$count_a - anbB/input$count_b
+
+  sims <- as.data.frame(cbind(anbA/input$count_a,anbB/input$count_b)) %>% 
+    pivot_longer(names_to = "anb",
+                 values_to = "scores",
+                 cols = everything())
+  
+  
+  ggplot(sims, aes(x=scores,fill = anb)) +
+    geom_histogram(binwidth=.01, alpha=.8, aes(y=..density..)) +
+    scale_fill_manual(values = c("#222d33","#c2224a"),
+                      labels = c("Anbieter A","Anbieter B")) +
+    scale_y_continuous(expand = c(0, 0), limits = c(0, 101)) +
+    xlab("Anteil positive Bewertungen") +
+    ylab("Dichte (%)") +
+    labs(caption = paste0("Anteil der sim. Fälle, in denen Anbieter A besser bewertet wird: ",sum(diffs>0)/10000)) +
+    theme_bw() +
+    theme(legend.position = "top",
+          legend.title = element_blank(),
+          panel.grid.major.x = element_line(color = "gray", size = .2),
+          panel.grid.major.y = element_blank(),
+          plot.caption = element_text(size = 8))
+})
+
+output$diff <- renderPlot({
+  
+  set.seed(42)
+  anbA <- rbinom(n=10000,size=input$count_a,prob = ((input$pos_a/100)*input$count_a)/input$count_a)
+  anbB <- rbinom(n=10000,size =input$count_b,prob = ((input$pos_b/100)*input$count_b)/input$count_b)
+  diffs <- anbA/input$count_a - anbB/input$count_b
+  sum(diffs>0)/10000
+  print(sum(diffs>0)/10000)
+  
+  ggplot(as.data.frame(diffs), aes(x=diffs)) +
+    stat_density(alpha = .3, fill = "#c2224a") +
+    scale_y_continuous(expand = c(0, 0)) +
+    xlab("Verteilung der Differenzen in den pos. Bewertungen") +
+    ylab("Dichte (%)") +
+    theme_bw() +
+    theme(legend.position = "bottom",
+          legend.title = element_blank(),
+          panel.grid.major.x = element_line(color = "gray", size = .2),
+          panel.grid.major.y = element_blank())
 })
 
 }

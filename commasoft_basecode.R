@@ -262,20 +262,50 @@ library(EnvStats)
 
 fisher.test(rbind(c(90,2),c(10,0)), alternative="less")
 
-# Simulation
-############
-set.seed(42)
-
-anbA <- rbinom(n=1000000,size=100,prob = 90/100)
-anbB <- rbinom(n=1000000,size =2,prob = 2/2)
-
-diffs <- anbA/100 - anbB/2
-
-plot(density(diffs, bw=.01))
-
-sum(diffs>0)/1000000
-
 # Less
 (factorial(90+2)*factorial(10+0)*factorial(90+10)*factorial(2+0))/(factorial(90)*factorial(10)*factorial(2)*factorial(0)*factorial(102))
 
 # Greater
+
+
+# Simulation
+############
+set.seed(42)
+anbA <- rbinom(n=10000,size=100,prob = 90/100)
+anbB <- rbinom(n=10000,size =2,prob = 2/2)
+
+sims <- as.data.frame(cbind(anbA/100,anbB/2)) %>% 
+    pivot_longer(names_to = "anb",
+                 values_to = "scores",
+                 cols = everything())
+
+ggplot(sims, aes(x=scores,fill = anb)) +
+    #stat_density(alpha = .3,bw=.01)
+    geom_histogram(binwidth=.01, alpha=.8, aes(y=..density..)) +
+    scale_fill_manual(values = c("#222d33","#c2224a"),
+                      labels = c("Anbieter A","Anbieter B")) +
+    scale_y_continuous(expand = c(0, 0), limits = c(0, 101)) +
+    xlab("Anteil positive Bewertungen") +
+    ylab("Dichte") +
+    theme_bw() +
+    theme(legend.position = "bottom",
+          legend.title = element_blank(),
+          panel.grid.major.x = element_line(color = "gray", size = .2),
+          panel.grid.major.y = element_blank())
+
+diffs <- anbA/100 - anbB/2
+sum(diffs>0)/1000000
+
+ggplot(as.data.frame(diffs), aes(x=diffs)) +
+    stat_density(alpha = .3,bw=.01, fill = "#c2224a") +
+    scale_y_continuous(expand = c(0, 0)) +
+    xlab("Differenz in den Anteilen pos. Bewertungen") +
+    ylab("Dichte (%)") +
+    theme_bw() +
+    theme(legend.position = "bottom",
+          legend.title = element_blank(),
+          panel.grid.major.x = element_line(color = "gray", size = .2),
+          panel.grid.major.y = element_blank())
+
+
+
