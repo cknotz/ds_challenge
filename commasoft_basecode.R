@@ -260,12 +260,10 @@ girafe(ggobj = p,
 ###############################################
 library(EnvStats)
 
+(90*0)/(2*10) # odds-ratio
+
 fisher.test(rbind(c(90,2),c(10,0)), alternative="less")
 
-# Less
-(factorial(90+2)*factorial(10+0)*factorial(90+10)*factorial(2+0))/(factorial(90)*factorial(10)*factorial(2)*factorial(0)*factorial(102))
-
-# Greater
 
 
 # Simulation

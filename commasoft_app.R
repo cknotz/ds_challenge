@@ -122,26 +122,16 @@ ui <- dashboardPage(
                                          ticks = F,
                                          label = "Anzahl Bewertungen"),
                              sliderInput(inputId = "pos_b",
-                                         min = 2,
+                                         min = 0,
                                          max = 100,
                                          step = 5,
                                          value = 100,
                                          ticks = F,
                                          label = "Prozent positiv")
                              ),
-                      HTML("<p>Die Aufgabe lässt sich auf zwei Weisen lösen. Eine Möglichkeit ist ein parametrischer Test,
-                       (d.h. ein Test, der auf Annahmen über die Verteilung der Daten in der Grundgesamtheit beruht), die
-                           zweite Möglichkeit ist ein Test mittels einer Simulation.</p>
-                           <p>In ersterem Fall verwendet man den Exakten Test nach Fisher, mit welchen
-                           Differenzen zwischen Stichprobenanteilen auch bei kleinen Stichprobengrößen (wie hier der Fall)
-                           auf ihre Signifikanz hin getestet werden können (die Alternative bei größeren
-                           Stichproben ist der klassische Signifikanztest für Stichprobenanteile basierend auf
-                           der Standardnormalverteilung).</p>
-                           <p>Der Exakte Test nach Fisher wird berechnet als die Wahrscheinlichkeit, die beobachtete oder
-                           eine noch extreme Verteilung zu erhalten unter der Annahme, dass es zwischen der Wahl des Anbieters
-                           und der Kundenzufriedenheit keinen Zusammenhang gibt. Formal wird dies berechnet als:</p>"),
+                      HTML(""),
                       withMathJax("$$p = \\frac{(a+b)!(c+d)!(a+c)!(b+d)!}{(a+b+c+d)!a!b!c!d!}$$")
-                      )
+                      ) # Tversky/Kahneman, Psycholgical Bulletin
               )),
           tabItem(tabName = "aufg3",
               fluidRow(
@@ -294,12 +284,12 @@ girafe(ggobj = p,
 output$sim <- renderPlot({
   set.seed(42)
   
-  print((input$pos_a/100)*input$count_a)
-  
-  anbA <- rbinom(n=10000,size=input$count_a,prob = (as.integer((input$pos_a/100)*input$count_a))/input$count_a)
-  anbB <- rbinom(n=10000,size =input$count_b,prob = (as.integer((input$pos_b/100)*input$count_b))/input$count_b)
+  anbA <- rbinom(n=10000,size=input$count_a,prob = ((input$pos_a/100)*input$count_a)/input$count_a)
+  anbB <- rbinom(n=10000,size =input$count_b,prob = ((input$pos_b/100)*input$count_b)/input$count_b)
   diffs <- anbA/input$count_a - anbB/input$count_b
 
+  print(mean(diffs))
+  
   sims <- as.data.frame(cbind(anbA/input$count_a,anbB/input$count_b)) %>% 
     pivot_longer(names_to = "anb",
                  values_to = "scores",
@@ -325,14 +315,14 @@ output$sim <- renderPlot({
 output$diff <- renderPlot({
   
   set.seed(42)
-  anbA <- rbinom(n=10000,size=input$count_a,prob = (as.integer((input$pos_a/100)*input$count_a))/input$count_a)
-  anbB <- rbinom(n=10000,size =input$count_b,prob = (as.integer((input$pos_b/100)*input$count_b))/input$count_b)
+  anbA <- rbinom(n=10000,size=input$count_a,prob = ((input$pos_a/100)*input$count_a)/input$count_a)
+  anbB <- rbinom(n=10000,size =input$count_b,prob = ((input$pos_b/100)*input$count_b)/input$count_b)
   diffs <- anbA/input$count_a - anbB/input$count_b
-  sum(diffs>0)/10000
-  print(sum(diffs>0)/10000)
+  #sum(diffs>0)/10000
   
   ggplot(as.data.frame(diffs), aes(x=diffs)) +
     stat_density(alpha = .3, fill = "#c2224a") +
+    geom_vline(xintercept = mean(diffs), color = "#c2224a", linetype = "dashed") +
     scale_y_continuous(expand = c(0, 0)) +
     xlab("Verteilung der Differenzen in den pos. Bewertungen") +
     ylab("Dichte (%)") +
