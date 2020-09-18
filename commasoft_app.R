@@ -296,8 +296,8 @@ output$sim <- renderPlot({
   
   print((input$pos_a/100)*input$count_a)
   
-  anbA <- rbinom(n=10000,size=input$count_a,prob = ((input$pos_a/100)*input$count_a)/input$count_a)
-  anbB <- rbinom(n=10000,size =input$count_b,prob = ((input$pos_b/100)*input$count_b)/input$count_b)
+  anbA <- rbinom(n=10000,size=input$count_a,prob = (as.integer((input$pos_a/100)*input$count_a))/input$count_a)
+  anbB <- rbinom(n=10000,size =input$count_b,prob = (as.integer((input$pos_b/100)*input$count_b))/input$count_b)
   diffs <- anbA/input$count_a - anbB/input$count_b
 
   sims <- as.data.frame(cbind(anbA/input$count_a,anbB/input$count_b)) %>% 
@@ -325,8 +325,8 @@ output$sim <- renderPlot({
 output$diff <- renderPlot({
   
   set.seed(42)
-  anbA <- rbinom(n=10000,size=input$count_a,prob = ((input$pos_a/100)*input$count_a)/input$count_a)
-  anbB <- rbinom(n=10000,size =input$count_b,prob = ((input$pos_b/100)*input$count_b)/input$count_b)
+  anbA <- rbinom(n=10000,size=input$count_a,prob = (as.integer((input$pos_a/100)*input$count_a))/input$count_a)
+  anbB <- rbinom(n=10000,size =input$count_b,prob = (as.integer((input$pos_b/100)*input$count_b))/input$count_b)
   diffs <- anbA/input$count_a - anbB/input$count_b
   sum(diffs>0)/10000
   print(sum(diffs>0)/10000)
