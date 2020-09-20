@@ -124,7 +124,7 @@ ui <- dashboardPage(
                              sliderInput(inputId = "pos_b",
                                          min = 0,
                                          max = 100,
-                                         step = 5,
+                                         step = 1,
                                          value = 100,
                                          ticks = F,
                                          label = "Prozent positiv")
@@ -281,57 +281,7 @@ girafe(ggobj = p,
 ##### Graph 2.1
 ###############
 
-output$sim <- renderPlot({
-  set.seed(42)
-  
-  anbA <- rbinom(n=10000,size=input$count_a,prob = ((input$pos_a/100)*input$count_a)/input$count_a)
-  anbB <- rbinom(n=10000,size =input$count_b,prob = ((input$pos_b/100)*input$count_b)/input$count_b)
-  diffs <- anbA/input$count_a - anbB/input$count_b
 
-  print(mean(diffs))
-  
-  sims <- as.data.frame(cbind(anbA/input$count_a,anbB/input$count_b)) %>% 
-    pivot_longer(names_to = "anb",
-                 values_to = "scores",
-                 cols = everything())
-  
-  
-  ggplot(sims, aes(x=scores,fill = anb)) +
-    geom_histogram(binwidth=.01, alpha=.8, aes(y=..density..)) +
-    scale_fill_manual(values = c("#222d33","#c2224a"),
-                      labels = c("Anbieter A","Anbieter B")) +
-    scale_y_continuous(expand = c(0, 0), limits = c(0, 101)) +
-    xlab("Anteil positive Bewertungen") +
-    ylab("Dichte (%)") +
-    labs(caption = paste0("Anteil der sim. Fälle, in denen Anbieter A besser bewertet wird: ",sum(diffs>0)/10000)) +
-    theme_bw() +
-    theme(legend.position = "top",
-          legend.title = element_blank(),
-          panel.grid.major.x = element_line(color = "gray", size = .2),
-          panel.grid.major.y = element_blank(),
-          plot.caption = element_text(size = 8))
-})
-
-output$diff <- renderPlot({
-  
-  set.seed(42)
-  anbA <- rbinom(n=10000,size=input$count_a,prob = ((input$pos_a/100)*input$count_a)/input$count_a)
-  anbB <- rbinom(n=10000,size =input$count_b,prob = ((input$pos_b/100)*input$count_b)/input$count_b)
-  diffs <- anbA/input$count_a - anbB/input$count_b
-  #sum(diffs>0)/10000
-  
-  ggplot(as.data.frame(diffs), aes(x=diffs)) +
-    stat_density(alpha = .3, fill = "#c2224a") +
-    geom_vline(xintercept = mean(diffs), color = "#c2224a", linetype = "dashed") +
-    scale_y_continuous(expand = c(0, 0)) +
-    xlab("Verteilung der Differenzen in den pos. Bewertungen") +
-    ylab("Dichte (%)") +
-    theme_bw() +
-    theme(legend.position = "bottom",
-          legend.title = element_blank(),
-          panel.grid.major.x = element_line(color = "gray", size = .2),
-          panel.grid.major.y = element_blank())
-})
 
 }
 

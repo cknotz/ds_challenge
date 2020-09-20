@@ -258,19 +258,86 @@ girafe(ggobj = p,
 
 # Aufg 3 (Randomization test/Fisher exact test)
 ###############################################
-library(EnvStats)
 
 (90*0)/(2*10) # odds-ratio
 
 fisher.test(rbind(c(90,2),c(10,0)), alternative="less")
 
+# by hand:
+one <- (factorial(90+2)*factorial(10+0)*factorial(90+10)*factorial(2+0)) /
+    (factorial(102)*factorial(90)*factorial(2)*factorial(10)*factorial(0)) # observed
+
+two <- (factorial(89+1)*factorial(11+1)*factorial(89+11)*factorial(1+1)) /
+    (factorial(102)*factorial(89)*factorial(1)*factorial(11)*factorial(1)) # one more extreme
+
+three <- (factorial(88+0)*factorial(12+2)*factorial(88+12)*factorial(0+2)) /
+    (factorial(102)*factorial(88)*factorial(0)*factorial(12)*factorial(2)) # one more extreme
+
+one+two+three # one sided, also two-sided (R sums probs of all tables with probs <= to observed; here: all!)
+
+one # one-sided, other direction?
 
 
-# Simulation
-############
+
+
+# Simulation I 
+##############
+
+# Generate data.frame
+df <- data.frame(anb = c(replicate(100, "Anbieter A"),replicate(2, "Anbieter B")),
+                 eval = c(c(replicate(90,1),replicate(10,0)),c(1,1)))
+
+table(df$anb,df$eval)
+
+# Storing proportions
+sum <- df %>% 
+  group_by(anb) %>% 
+  summarize(positive = mean(eval == 1),
+    sample_size = n())
+
+phat_A <- sum$positive[1]
+phat_B <- sum$positive[2]
+n_A <- sum$sample_size[1]
+n_B <- sum$sample_size[2]
+obs_diff <- phat_A - phat_B
+
+# Shuffling
+set.seed(17)
+
+shuffles <- mosaic::do(1000) *
+    (df %>% 
+         mutate(anb = mosaic::shuffle(anb)) %>% 
+         group_by(anb) %>% 
+         summarize(positive = mean(eval == 1)))
+
+ggplot(shuffles, aes(x=anb,y=positive)) +
+    geom_boxplot()
+
+
+null_dist <- shuffles %>% 
+    group_by(.index) %>% 
+    summarize(diff = -diff(positive)) # negative of difference to obtain same sign as diff A-B
+
+
+sum(round(null_dist$diff,2)>0)/1000
+
+ggplot(null_dist, aes(x = diff)) +
+  geom_histogram(color = "white")
+
+
+
+# Compute p-value
+pvalue <- null_dist %>%
+  filter( (round(diff,2) > obs_diff) ) %>%
+  nrow() / nrow(null_dist)
+pvalue
+
+
+# Simulation II
+###############
 set.seed(42)
 anbA <- rbinom(n=10000,size=100,prob = 90/100)
-anbB <- rbinom(n=10000,size =2,prob = 2/2)
+anbB <- rbinom(n=10000,size=2,prob = 2/2)
 
 sims <- as.data.frame(cbind(anbA/100,anbB/2)) %>% 
     pivot_longer(names_to = "anb",
@@ -278,13 +345,12 @@ sims <- as.data.frame(cbind(anbA/100,anbB/2)) %>%
                  cols = everything())
 
 ggplot(sims, aes(x=scores,fill = anb)) +
-    #stat_density(alpha = .3,bw=.01)
-    geom_histogram(binwidth=.01, alpha=.8, aes(y=..density..)) +
+    geom_histogram(binwidth =.01,alpha=.8, aes(y=..density..), position = "identity") +
     scale_fill_manual(values = c("#222d33","#c2224a"),
                       labels = c("Anbieter A","Anbieter B")) +
     scale_y_continuous(expand = c(0, 0), limits = c(0, 101)) +
     xlab("Anteil positive Bewertungen") +
-    ylab("Dichte") +
+    ylab("Dichte (%)") +
     theme_bw() +
     theme(legend.position = "bottom",
           legend.title = element_blank(),
@@ -292,7 +358,6 @@ ggplot(sims, aes(x=scores,fill = anb)) +
           panel.grid.major.y = element_blank())
 
 diffs <- anbA/100 - anbB/2
-sum(diffs>0)/1000000
 
 ggplot(as.data.frame(diffs), aes(x=diffs)) +
     stat_density(alpha = .3,bw=.01, fill = "#c2224a") +
@@ -305,5 +370,5 @@ ggplot(as.data.frame(diffs), aes(x=diffs)) +
           panel.grid.major.x = element_line(color = "gray", size = .2),
           panel.grid.major.y = element_blank())
 
-
+sum(diffs>=0)/10000
 
