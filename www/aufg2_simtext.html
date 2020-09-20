@@ -1,0 +1,43 @@
+<p>
+Die Wahrscheinlichkeit, dass Anbieter A zuverlässiger als Anbieter B ist und daher von den Kunden systematisch besser bewertet wird, lässt sich am Anschaulichsten mit Hilfe einer
+Simulation schätzen. Vereinfacht dargestellt schätzt man hier, in wie weit die hier beobachtete im Schnitt schlechtere Bewertung von Anbieter A (90% positiv im Vergleich zu 100% positiv für Anbieter B) nur einen Ausreisser darstellt könnte und normalerweise Anbieter A systematisch besser bewertet wird.
+</p>
+
+<p>
+Dabei erstellt man zuerst einen Datensatz aller Kundenbewertungen. Dieser umfasst zwei Merkmale: Der gewählte Anbieter (A oder B) und die Bewertung (positiv oder negativ). Da ingesamt 100 Kunden Anbieter A gewählt haben und 2 Kunden Anbieter B beinhaltet der Datensatz 102 einzelne Beobachtungen (90 x Anbieter A & positiv; 10 x Anbieter A & negativ; 2 x Anbieter B & positiv).
+</p>
+
+<p>
+Im nächsten Schritt wird der Datensatz randomisiert, also ähnlich einem Set von Spielkarten durchgemischt. Dadurch entsteht eine Version des Datensatzes, welche rein durch Zufall zustandegekommen ist. Dieser Vorgang wird sehr oft (hier: 1000 mal) wiederholt, und es wird bei jedem Durchgang festgehalten, wie viele positive Bewertungen jeder Anbieter erhält.</p>
+
+<p>
+Die Gesamtzahl der vielen zufälligen Versionen des ursprünglichen Datensatzes sollte dann alle Kombinationen von positiven und negativen Bewertungen erhalten, die bei 100 Bewertungen für Anbieter A und 2 für Anbieter B möglich sind. Zudem sollten sehr wahrscheinliche Kombinationen in den simulierten Daten sehr häufig vorkommen; sehr unwahrscheinliche Kombinationen sollten dagegen nur selten enthalten sein.
+</p>
+
+<p>
+Wenn dann in sehr wenigen der simulierten Daten Anbieter A schlechter bewertet wird als Anbieter B, dann würde das darauf hindeuten, dass die ursprünglich beobachteten Daten wahrscheinlich nur einen zufälligen Ausreisser darstellen und Anbieter A normalerweise besser bewertet wird. Falls jedoch in vielen der simulierten Daten Anbieter B besser bewertet würde, dann wäre das ein Hinweis, dass die ursprünglichen Daten die eigentlich Lage schon korrekt widerspiegeln - dass also Anbieter A in Wahrheit nicht besser bewertet wird.
+</p>
+
+<p>
+Die Anteile der positiven Bewertungen pro Anbieter in den 1000 simulierten Datensätze sind in Grafik (1) dargestellt. Tatsächlich bewegen sich die positiven Bewertungen von Anbieter A in den simulierten Daten durchweg im Umfeld von 90 Prozent. Anbieter B erhält ebenfalls überwiegend nur positive Bewertungen, allerdings aber auch in einigen Fällen keine oder nur zur Hälfte positive Bewertungen.
+</p>
+
+<p>
+Um ein genaueres Bild zu erhalten, kann man berechnen, in wie vielen der zufälligen Datensätze Anbieter A besser bewertet wird. Grafik (2) zeigt, wie sich die Differenzen zwischen den Bewertungen beider Anbieter über die simulierten Daten verteilen.
+</p>
+
+<p>
+In 800 der 1000 Datensätze entspricht die Differenz zwischen Anbieter A und B (Anteil positive Bewertungen für Anbieter A minus Amteil positive Bewertungen für Anbieter B) genau -10 Prozent - also der ursprünglich beobachteten Differenz. In rund 200 Fällen wird dagegen Anbieter A besser bewertet.
+</p>
+
+<p>
+Die genauen Anteile werden hier angezeigt:
+</p>
+
+<p>
+Als zusätzlichen formellen Test kann man die Wahrscheinlichkeit, dass Anbieter A normalerweise besser bewertet wird auch über den exakten Test nach Fisher berechnen. Äquivalent zur Simulation berechnet der Test, wie wahrscheinlich verschiedene Kombinationen von positiven und negativen Bewertungen unter den gegebenen Rahmenbedingungen (100 Bewertungen für Anbieter A, 2 für Anbieter B) sind. Der Test ist auch speziell für kleine Fallzahlen (wie hier vorhanden) geeignet.
+</p>
+
+<p>
+Insgesamt zeigen die Daten, dass die Wahrscheinlichkeit, dass Anbieter A normalerweise besser bewertet wird, liegt nur bei 20%. Die im Schnitt bessere Bewertung von Anbieter B ist aller Wahrscheinlichkeit nach kein Zufall.
+</p>

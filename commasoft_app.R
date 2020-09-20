@@ -11,6 +11,11 @@ library(ggiraph)
 table <- readRDS("www/backup.rds")
 names(table)[names(table)=="Total"] <- "Gesamt"
 
+# paste(readLines("www/tab1.html"), collapse="\n")
+# paste(readLines("www/tab2.html"), collapse="\n")
+# paste(readLines("www/tab3.html"), collapse="\n")
+# paste(readLines("www/tab4.html"), collapse="\n")
+
 ui <- dashboardPage(
   dashboardHeader(title = "Data Science Challenge", titleWidth = 300),
   dashboardSidebar(
@@ -90,47 +95,32 @@ ui <- dashboardPage(
               fluidRow(
                   box(width = 12, collapsible = F, solidHeader = T,
                       title = "Amazon-Kundenbewertungen",
+                      HTML(paste(readLines("www/aufg2_text.html"), collapse="\n")),
                       column(width = 6,
-                             plotOutput("sim")
+                             br(),
+                             HTML(paste(readLines("www/tab2.html"), collapse="\n"))
                              ),
                       column(width = 6,
-                             plotOutput("diff")),
-                      column(width = 6,
-                             h5("Anbieter A"),
-                             sliderInput(inputId = "count_a",
-                                         min = 2,
-                                         max = 500,
-                                         value = 100,
-                                         step = 1,
-                                         ticks = F,
-                                         label = "Anzahl Bewertungen"),
-                             sliderInput(inputId = "pos_a",
-                                         min = 0,
-                                         max = 100,
-                                         step = 1,
-                                         value = 90,
-                                         ticks = F,
-                                         label = "Prozent positiv")
+                             br(),
+                             HTML(paste(readLines("www/tab1.html"), collapse="\n"))
+                             ),
+                      column(width=12,
+                             br(),
+                             HTML("<p>Die Wahrscheinlichkeit, diese Werte zu beobachten, falls es in Wahrheit keinen 
+                                  Zusammenhang zwischen der Wahl des Anbieters und der Kundenzufriedenheit gibt, lässt sich
+                                  dann mittels folgenden Formel berechnen:</p>"),
+                             withMathJax("$$p = \\frac{(A+B)!(C+D)!(A+C)!(B+D)!}{(A+B+C+D)!A!B!C!D!}$$"),
+                             HTML("<p>wobei die beobachteten Werte wie in Tabelle (2) dargestellt in die Formel eingetragen 
+                             werden.</p>")
                              ),
                       column(width = 6,
-                             h5("Anbieter B"),
-                             sliderInput(inputId = "count_b",
-                                         min = 2,
-                                         max = 500,
-                                         value = 2,
-                                         step = 1,
-                                         ticks = F,
-                                         label = "Anzahl Bewertungen"),
-                             sliderInput(inputId = "pos_b",
-                                         min = 0,
-                                         max = 100,
-                                         step = 1,
-                                         value = 100,
-                                         ticks = F,
-                                         label = "Prozent positiv")
+                             HTML(paste(readLines("www/tab3.html"), collapse="\n"))
                              ),
-                      HTML(""),
-                      withMathJax("$$p = \\frac{(a+b)!(c+d)!(a+c)!(b+d)!}{(a+b+c+d)!a!b!c!d!}$$")
+                      column(width = 6,
+                             HTML(paste(readLines("www/tab4.html"), collapse="\n"))
+                             ),
+                      br(),
+                      
                       ) # Tversky/Kahneman, Psycholgical Bulletin
               )),
           tabItem(tabName = "aufg3",

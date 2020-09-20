@@ -259,7 +259,11 @@ girafe(ggobj = p,
 # Aufg 3 (Randomization test/Fisher exact test)
 ###############################################
 
-(90*0)/(2*10) # odds-ratio
+(90/100)-(2/2)
+
+(89/100)-(1/2)
+
+(88/100)-(0/2)
 
 fisher.test(rbind(c(90,2),c(10,0)), alternative="less")
 
@@ -277,8 +281,7 @@ one+two+three # one sided, also two-sided (R sums probs of all tables with probs
 
 one # one-sided, other direction?
 
-
-
+two+three
 
 # Simulation I 
 ##############
@@ -311,20 +314,32 @@ shuffles <- mosaic::do(1000) *
          summarize(positive = mean(eval == 1)))
 
 ggplot(shuffles, aes(x=anb,y=positive)) +
-    geom_boxplot()
+    geom_jitter(alpha=.2, width = 0.25, size = 2,color = "#c2224a") +
+    scale_y_continuous(breaks = seq(0,1,.1)) +
+    ylab("Anteil positive Bewertungen") +
+    xlab("") +
+    theme_bw() +
+    theme(legend.position = "bottom",
+          legend.title = element_blank(),
+          panel.grid.major.x = element_line(color = "gray", size = .2),
+          panel.grid.major.y = element_blank())
 
 
 null_dist <- shuffles %>% 
     group_by(.index) %>% 
     summarize(diff = -diff(positive)) # negative of difference to obtain same sign as diff A-B
 
+ggplot(null_dist, aes(x = diff)) +
+  geom_histogram(color = "white", fill = "#c2224a") +
+    scale_y_continuous(labels = function(x){x/1000}) +
+    scale_x_continuous(breaks = seq(-0.2,1,.1)) +
+    theme_bw() +
+    theme(legend.position = "bottom",
+          legend.title = element_blank(),
+          panel.grid.major.x = element_line(color = "gray", size = .2),
+          panel.grid.major.y = element_blank())
 
 sum(round(null_dist$diff,2)>0)/1000
-
-ggplot(null_dist, aes(x = diff)) +
-  geom_histogram(color = "white")
-
-
 
 # Compute p-value
 pvalue <- null_dist %>%
