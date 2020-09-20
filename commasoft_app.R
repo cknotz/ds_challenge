@@ -149,7 +149,7 @@ ui <- dashboardPage(
                            Maschinen; relativ wendige wenden schon Instrumentendaten, ggf. auch in real-time, an. In ersterem
                            Fall müssten zunächst Messinstrumente installiert und systematisch Daten gesammelt werden.</p>")),
                   box(width = 12,collapsible = F,solidHeader = T,
-                      title = "Frage 3: ")
+                      title = "Frage 3: Welche Erfahrungswerte liegen bereits vor?")
               ))
   ))
 )
