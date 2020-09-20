@@ -331,7 +331,10 @@ null_dist <- shuffles %>%
 
 ggplot(null_dist, aes(x = diff)) +
   geom_histogram(color = "white", fill = "#c2224a") +
-    scale_y_continuous(labels = function(x){x/1000}) +
+    scale_y_continuous(labels = function(x){x/1000},
+                       expand = c(0, 0),
+                       limits = c(0,1000),
+                       breaks = seq(0,1000,200)) +
     scale_x_continuous(breaks = seq(-0.2,1,.1)) +
     theme_bw() +
     theme(legend.position = "bottom",
@@ -346,6 +349,10 @@ pvalue <- null_dist %>%
   filter( (round(diff,2) > obs_diff) ) %>%
   nrow() / nrow(null_dist)
 pvalue
+
+scale_y_continuous(expand = c(0, 0), limits = c(0,610)) +
+
+
 
 
 # Simulation II
