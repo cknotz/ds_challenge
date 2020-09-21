@@ -20,10 +20,10 @@ ui <- dashboardPage(
   dashboardHeader(title = "Data Science Challenge", titleWidth = 300),
   dashboardSidebar(
       sidebarMenu(
-          menuItem("Start", tabName = "start"),
+          menuItem("Start", tabName = "start", selected = T),
           menuItem("Meine Lösung", tabName = "solu",
           menuSubItem("Aufgabe 1", tabName = "aufg1"), #, icon = icon("chart-bar", lib = "font-awesome")
-          menuSubItem("Aufgabe 2", tabName = "aufg2", selected = T), #, icon = icon("amazon", lib = "font-awesome")
+          menuSubItem("Aufgabe 2", tabName = "aufg2"), #, icon = icon("amazon", lib = "font-awesome")
           menuSubItem("Aufgabe 3", tabName = "aufg3")) #, icon = icon("cogs", lib = "font-awesome")
   )),
   dashboardBody(
@@ -40,21 +40,32 @@ ui <- dashboardPage(
                   fluidRow(
                       box(width = 12, collapsible = F,solidHeader = T,
                           HTML("<p><strong>Herausforderungen stelle ich mich immer gerne.</strong></p>
-                               <p>Zu meiner Lösung:
+                               <p>Meine Lösungen für die drei Aufgaben stelle ich Ihnen über dieses interaktive Dashboard vor.</p>
+                               <p>Zu meinen Lösungen:
                                <ul>
                                <li>Die Daten zur Zahl der Athleten und der gewonnenen Medaillen bei den Olympischen 
-                               Sommerspielen 2016 werden durch das Dashboard selbst von Wikipedia 'gescraped' 
+                               Sommerspielen 2016 habe ich direkt von Wikipedia 'gescraped'
                                (<a target='_blank'
                                href='https://en.wikipedia.org/wiki/2016_Summer_Olympics#Number_of_athletes_by_National_Olympic_Committee'>
                                Quelle für die Zahl der Athleten</a>; 
                                <a target='_blank'
                                href='https://en.wikipedia.org/wiki/2016_Summer_Olympics_medal_table#Medal_table'>
-                               Quelle für die Zahl der Medaillen</a>)</li>
-                               <li>Bei den Antworten auf Frage 3 beziehe ich mich u.a. auf den Artikel zur Anwendung von Machine-Learning Algorithmen
-                               im Bereich Predictive Maintenance von Carvalho et al. (<a target='_blank'
-                               href='https://doi.org/10.1016/j.cie.2019.106024'>2019</a>).
+                               Quelle für die Zahl der Medaillen</a>).</li>
+                               <li>Der Code, um die Daten von Wikipedia zu 'scrapen' sowie der Code für dieses Dashbord (inkl. der Simulation) sind auf
+                               meinem <a href='' target='_blank'>Github Profil</a> hinterlegt.</li>
+                               <li>Die Grafiken zu Aufgabe 1 sind interaktiv und zoombar.</li>
+                               <li>Bei den Antworten auf Frage 3 beziehe ich mich u.a. auf zwei Studien zu Predictive Maintenance
+                               Praktiken von PricewaterhouseCoopers (<a target='_blank href='https://www.pwc.nl/nl/assets/documents/pwc-predictive-maintenance-4-0.pdf'></a>;<a target='_blank'
+                               href='https://www.mainnovation.com/wp-content/uploads/tmp/6397245268d8d3711c88cda0b4585ab02e612f2e.pdf'>2018</a>).
                                </li>
-                               </ul></p>")
+                               </ul>
+                               Mir hat die Challenge viel Spaß gemacht, und ich hoffe natürlich, dass Sie meine Antworten überzeugen.
+                               Mein genaues Vorgehen und die Resultate bespreche ich natürlich sehr gerne näher mit Ihnen in einem persönlichen Gespräch.
+                               </p>
+                               <br>
+                               <p>Freundliche Grüße</p>
+                               <p>Carlo Knotz</p>
+                               ")
                       )
                   )),
           tabItem(tabName = "aufg1",
@@ -132,20 +143,28 @@ ui <- dashboardPage(
           tabItem(tabName = "aufg3",
               fluidRow(
                   box(width = 12,collapsible = F,solidHeader = T,
-                      title = "Frage 1: Was ist das primäre Ziel für den Einsatz von Predictive Maintenance?",
-                      HTML("<p>Aller Wahrscheinlichkeit nach ist das Ziel, Wartungszeiten zu verkürzen 
-                      (bzw. zu vermeiden, wo diese nicht nötig sind) und daher vorhandenes Equipment optimaler zu nutzen. Andere
-                           Motive sind allerdings auch denkbar (bspw. Unfallschutz oder Qualitätssicherung). Je nach Ziel ändert sich ggf.
-                           auch, welche Gütemaße bei der Bewertungen von Algorithmen angewandt werden müssen. Sollen Wartungen optimiert werden,
-                           spielt die Präzision (die Vermeidung falscher positiver Diagnosen) eine zentrale Rolle; bei der Qualitätssicherung
-                           ist die Vermeidung von falscher negativer Diagnosen (die Sensitivität) wichtiger.</p>")),
+                      title = "Frage 1: Was ist das primäre Ziel?",
+                      HTML("<p>Oft ist das Ziel natürlich, Wartungen zu optimieren und dadurch vorhandenes Equipment 
+                      effizienter zu nutzen. Andere Motive sind allerdings auch denkbar, bspw. Unfallschutz oder 
+                      Qualitätssicherung. Je nach Ziel ändert sich ggf., welche Indikatoren bei der Bewertung von 
+                      Algorithmen angewandt werden. Sollen Wartungen optimiert werden, spielt die Präzision 
+                      (die Vermeidung falscher positiver Diagnosen, also von Fehlalarmen) eine zentrale Rolle; 
+                      bei der Qualitätssicherung ist die Vermeidung falscher negativer Diagnosen (die Sensitivität) 
+                      wichtiger.</p>")),
                   box(width = 12,collapsible = F, solidHeader = T,
-                      title = "Frage 2: Wie werden die Maschinen momentan inspiziert?",
-                      HTML("<p>Laut einer Umfrage von PWC verlassen sich viele Betrieben auf visuelle Inspektionen ihrer
-                           Maschinen; relativ wendige wenden schon Instrumentendaten, ggf. auch in real-time, an. In ersterem
-                           Fall müssten zunächst Messinstrumente installiert und systematisch Daten gesammelt werden.</p>")),
+                      title = "Frage 2: Welche IT Ressourcen werden momentan zur Organisation der Instandhaltung angewandt?",
+                      HTML("<p>Viele Firmen verwenden laut der Studie von PWC weiterhin noch Microsoft Excel für die 
+                           Datenbearbeitung rund um die Instandhaltung, andere schon Datenbanksoftware oder 
+                           Statistiksoftware. Je nach dem bisherigen Stand der IT ergibt sich ggf. besonderer Aufwand 
+                           bei der Datenaufbereitung. Außerdem liegt ggf. auch Bedarf an Training in der Datenbearbeitung 
+                           oder Datenanalyse vor.</p>")),
                   box(width = 12,collapsible = F,solidHeader = T,
-                      title = "Frage 3: Welche Erfahrungswerte liegen bereits vor?")
+                      title = "Frage 3: Wie viele Fälle von reparaturbedürftigen Fehlfunktionen sind erfasst?",
+                      HTML("<p>Um einen Algorithmus zur Vorhersage von Inspektions- und Reparaturbedarf trainieren zu 
+                           können, braucht es eine hinreichend große Zahl an bisherigen Fehlfunktionen, die als 
+                           Datengrundlage genutzt werden können. Sind diese nicht vorhanden (etwa, weil Equipment schon 
+                           bei frühen Anzeichen abgeschaltet wird), muss ggf. auf Techniken wie Simulationen 
+                           zurückgegriffen werden.</p>"))
               ))
   ))
 )
@@ -312,12 +331,14 @@ observeEvent(input$runsim,{
     scale_y_continuous(breaks = seq(0,1,.1)) +
     ylab("Anteil positive Bewertungen") +
     xlab("") +
-    labs(title = "(1)") +
+    labs(title = "(1)",
+         caption = "Die Daten sind zur besseren Lesbarkeit leicht gestreut.") +
     theme_bw() +
     theme(legend.position = "bottom",
           legend.title = element_blank(),
           panel.grid.major.x = element_line(color = "gray", size = .2),
-          panel.grid.major.y = element_blank())
+          panel.grid.major.y = element_blank(),
+          plot.caption = element_text(size = 7))
     
   })
   
@@ -369,9 +390,6 @@ observeEvent(input$runsim,{
           HTML(paste(readLines("www/aufg2_simtext3.html"), collapse="\n"))
   })
   
-  removeModal()
-  showModal(modalDialog("Simulation fertig!", footer=NULL)) 
-  Sys.sleep(1)
   removeModal()
 })
 
