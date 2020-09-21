@@ -95,33 +95,39 @@ ui <- dashboardPage(
               fluidRow(
                   box(width = 12, collapsible = F, solidHeader = T,
                       title = "Amazon-Kundenbewertungen",
-                      HTML(paste(readLines("www/aufg2_text.html"), collapse="\n")),
-                      column(width = 6,
-                             br(),
-                             HTML(paste(readLines("www/tab2.html"), collapse="\n"))
-                             ),
-                      column(width = 6,
-                             br(),
-                             HTML(paste(readLines("www/tab1.html"), collapse="\n"))
-                             ),
-                      column(width=12,
-                             br(),
-                             HTML("<p>Die Wahrscheinlichkeit, diese Werte zu beobachten, falls es in Wahrheit keinen 
-                                  Zusammenhang zwischen der Wahl des Anbieters und der Kundenzufriedenheit gibt, lässt sich
-                                  dann mittels folgenden Formel berechnen:</p>"),
-                             withMathJax("$$p = \\frac{(A+B)!(C+D)!(A+C)!(B+D)!}{(A+B+C+D)!A!B!C!D!}$$"),
-                             HTML("<p>wobei die beobachteten Werte wie in Tabelle (2) dargestellt in die Formel eingetragen 
-                             werden.</p>")
-                             ),
-                      column(width = 6,
-                             HTML(paste(readLines("www/tab3.html"), collapse="\n"))
-                             ),
-                      column(width = 6,
-                             HTML(paste(readLines("www/tab4.html"), collapse="\n"))
-                             ),
+                      column(width = 12,
+                             HTML(paste(readLines("www/aufg2_simtext1.html"), collapse="\n"))),
                       br(),
-                      
-                      ) # Tversky/Kahneman, Psycholgical Bulletin
+                      br(),
+                      column(width = 12,
+                      actionBttn(
+                        inputId = "runsim",
+                        label = "Simulation starten", 
+                        style = "material-flat",
+                        color = "danger",
+                        size = "xs"),
+                      br(),
+                      br(),),
+                      column(width = 6, align = "center",
+                      plotOutput("simvals")),
+                      column(width = 6, align = "center",
+                      plotOutput("simdiffs")),
+                      column(width = 12,
+                            br(),
+                            br(),
+                            uiOutput("simres1")),
+                      # column(width = 6, align = "center",
+                      #        uiOutput("h1"),
+                      #        uiOutput("simres2")
+                      #        ),
+                      column(width = 12, align = "center",
+                             uiOutput("h2"),
+                             uiOutput("simres3")
+                             ),
+                      column(width = 12,
+                             uiOutput("simres4")
+                             )
+                      )
               )),
           tabItem(tabName = "aufg3",
               fluidRow(
@@ -271,7 +277,103 @@ girafe(ggobj = p,
 ##### Graph 2.1
 ###############
 
+observeEvent(input$runsim,{
+  print("blork")
+  
+  showModal(modalDialog("Simulation läuft...", footer=NULL)) 
+  
+  # Generate dataset
+  df <- data.frame(anb = c(replicate(100, "Anbieter A"),replicate(2, "Anbieter B")),
+                 eval = c(c(replicate(90,1),replicate(10,0)),c(1,1)))
+  
+  # Storing proportions
+  sum <- df %>% 
+    group_by(anb) %>% 
+    summarize(positive = mean(eval == 1),
+      sample_size = n())
 
+  phat_A <- sum$positive[1]
+  phat_B <- sum$positive[2]
+  n_A <- sum$sample_size[1]
+  n_B <- sum$sample_size[2]
+  obs_diff <- phat_A - phat_B
+  
+  set.seed(17)
+  
+  shuffles <- mosaic::do(1000) *
+    (df %>% 
+         mutate(anb = mosaic::shuffle(anb)) %>% 
+         group_by(anb) %>% 
+         summarize(positive = mean(eval == 1)))
+  
+  output$simvals <- renderPlot({
+    ggplot(shuffles, aes(x=anb,y=positive)) +
+    geom_jitter(alpha=.2, width = 0.25, size = 2,color = "#c2224a") +
+    scale_y_continuous(breaks = seq(0,1,.1)) +
+    ylab("Anteil positive Bewertungen") +
+    xlab("") +
+    labs(title = "(1)") +
+    theme_bw() +
+    theme(legend.position = "bottom",
+          legend.title = element_blank(),
+          panel.grid.major.x = element_line(color = "gray", size = .2),
+          panel.grid.major.y = element_blank())
+    
+  })
+  
+  null_dist <- shuffles %>% 
+    group_by(.index) %>% 
+    summarize(diff = -diff(positive)) # negative of difference to obtain same sign as diff A-B
+  
+  output$simdiffs <- renderPlot({
+  ggplot(null_dist, aes(x = diff)) +
+    geom_histogram(color = "white", fill = "#c2224a") +
+    scale_y_continuous(expand = c(0, 0),
+                       limits = c(0,1000),
+                       breaks = seq(0,1000,200)) +
+    scale_x_continuous(breaks = seq(-0.2,1,.1)) +
+    ylab("Häufigkeit") +
+    xlab("Differenz im Anteil der positiven Bewertungen (Anb. A - Anb. B)") +
+    labs(title = "(2)") +
+    theme_bw() +
+    theme(legend.position = "bottom",
+          legend.title = element_blank(),
+          panel.grid.major.x = element_line(color = "gray", size = .2),
+          panel.grid.major.y = element_blank())
+  
+  })
+  
+  p <- sum(round(null_dist$diff<=0),2)/1000
+  
+  output$simp <- renderPrint({
+    cat(p)
+  })
+  
+  output$h2 <- renderUI({
+   tags$b("Aus Fisher-Test berechnete Wahrscheinlichkeit (p-Wert), dass Anb. A nicht besser bewertet wird:") 
+  })
+  
+  fisher <- fisher.test(rbind(c(90,2),c(10,0)), alternative="less")
+  
+  output$fisherp <- renderPrint({
+    cat(round(fisher$p.value,3))
+  })
+  
+  output$simres1 <- renderUI({
+          HTML(paste(readLines("www/aufg2_simtext2.html"), collapse="\n"))
+  })
+  output$simres3 <- renderUI({
+          verbatimTextOutput("fisherp")
+  })
+  output$simres4 <- renderUI({
+          HTML(paste(readLines("www/aufg2_simtext3.html"), collapse="\n"))
+  })
+  
+  removeModal()
+  showModal(modalDialog("Simulation fertig!", footer=NULL)) 
+  Sys.sleep(1)
+  removeModal()
+})
 
 }
 

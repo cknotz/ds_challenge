@@ -344,13 +344,13 @@ ggplot(null_dist, aes(x = diff)) +
 
 sum(round(null_dist$diff,2)>0)/1000
 
+sum(round(null_dist$diff,2)<=0)/1000
+
 # Compute p-value
 pvalue <- null_dist %>%
   filter( (round(diff,2) > obs_diff) ) %>%
   nrow() / nrow(null_dist)
 pvalue
-
-scale_y_continuous(expand = c(0, 0), limits = c(0,610)) +
 
 
 
