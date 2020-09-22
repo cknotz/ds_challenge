@@ -46,8 +46,7 @@ ui <- dashboardPage(
                                <li>Die Daten zur Zahl der Athleten und der gewonnenen Medaillen bei den Olympischen 
                                Sommerspielen 2016 habe ich direkt von Wikipedia 'gescraped'
                                (<a target='_blank'
-                               href='https://en.wikipedia.org/wiki/2016_Summer_Olympics#Number_of_athletes_by_National_Olympic_Committee'>
-                               Quelle für die Zahl der Athleten</a>; 
+                               href='https://en.wikipedia.org/wiki/2016_Summer_Olympics#Number_of_athletes_by_National_Olympic_Committee'>Quelle für die Zahl der Athleten</a>; 
                                <a target='_blank'
                                href='https://en.wikipedia.org/wiki/2016_Summer_Olympics_medal_table#Medal_table'>
                                Quelle für die Zahl der Medaillen</a>).</li>
@@ -55,7 +54,7 @@ ui <- dashboardPage(
                                meinem <a href='' target='_blank'>Github Profil</a> hinterlegt.</li>
                                <li>Die Grafiken zu Aufgabe 1 sind interaktiv und zoombar.</li>
                                <li>Bei den Antworten auf Frage 3 beziehe ich mich u.a. auf zwei Studien zu Predictive Maintenance
-                               Praktiken von PricewaterhouseCoopers (<a target='_blank href='https://www.pwc.nl/nl/assets/documents/pwc-predictive-maintenance-4-0.pdf'></a>;<a target='_blank'
+                               Praktiken von PricewaterhouseCoopers (<a target='_blank href='https://www.pwc.nl/nl/assets/documents/pwc-predictive-maintenance-4-0.pdf'>2017</a>; <a target='_blank'
                                href='https://www.mainnovation.com/wp-content/uploads/tmp/6397245268d8d3711c88cda0b4585ab02e612f2e.pdf'>2018</a>).
                                </li>
                                </ul>
