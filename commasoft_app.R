@@ -49,10 +49,10 @@ ui <- dashboardPage(
                                href='https://en.wikipedia.org/wiki/2016_Summer_Olympics#Number_of_athletes_by_National_Olympic_Committee'>Quelle für die Zahl der Athleten</a>; 
                                <a target='_blank'
                                href='https://en.wikipedia.org/wiki/2016_Summer_Olympics_medal_table#Medal_table'>
-                               Quelle für die Zahl der Medaillen</a>).</li>
+                               Quelle für die Zahl der Medaillen</a>). Bei der Zahl der Athleten beschränke ich mich auf
+                               die ersten 75 Länder, um die Grafik lesbar zu halten.</li>
                                <li>Der Code, um die Daten von Wikipedia zu 'scrapen' sowie der Code für dieses Dashbord (inkl. der Simulation) sind auf
                                meinem <a href='' target='_blank'>Github Profil</a> hinterlegt.</li>
-                               <li>Die Grafiken zu Aufgabe 1 sind interaktiv und zoombar.</li>
                                <li>Bei den Antworten auf Frage 3 beziehe ich mich u.a. auf zwei Studien zu Predictive Maintenance
                                Praktiken von PricewaterhouseCoopers (<a target='_blank href='https://www.pwc.nl/nl/assets/documents/pwc-predictive-maintenance-4-0.pdf'>2017</a>; <a target='_blank'
                                href='https://www.mainnovation.com/wp-content/uploads/tmp/6397245268d8d3711c88cda0b4585ab02e612f2e.pdf'>2018</a>).
@@ -75,7 +75,7 @@ ui <- dashboardPage(
                                   sliderInput("n_athletes",
                                               label = "Anzahl Länder",
                                               min = 10,
-                                              max = 207,
+                                              max = 75,
                                               value = 10,
                                               step = 1,
                                               ticks = F)),
@@ -185,7 +185,7 @@ p <- table %>%
     geom_bar_interactive(stat = "identity", fill = "#c2224a",
                          aes(tooltip = paste0("<strong>",country_de,"</strong>\n\n",
                                               "Anzahl Athleten: ",no,"\n\n",
-                                              "Für weitere Informationen bitte auf den Balken klicken."),
+                                              "Für weitere Informationen auf den Balken klicken bzw. 2x tippen."),
                              onclick = onclick_de)) +
     ylab("Athleten") +
     xlab("") +
@@ -224,7 +224,7 @@ p <- table %>% arrange(-table$Gesamt,table$c_abbrev) %>%
                                               "Gold: ",Gold,"\n",
                                               "Silber: ",Silber,"\n",
                                               "Bronze: ",Bronze,"\n\n",
-                                              "Für weitere Informationen bitte auf den Balken klicken."),
+                                              "Für weitere Informationen auf den Balken klicken bzw. 2x tippen."),
                              onclick = onclick_de)) +
     coord_flip() +
     xlab("") +
@@ -267,7 +267,7 @@ p <- table %>%
                                tooltip = paste0("<strong>",country_de,"</strong>\n\n",
                                               "Anzahl Athleten: ",no,"\n",
                                               names(table)[names(table) == input$medal_select],": ",!!sym(input$medal_select),"\n\n",
-                                              "Für weitere Informationen bitte auf den Punkt klicken."))) +
+                                              "Für weitere Informationen auf den Punkt klicken bzw. 2x tippen."))) +
     ylab(names(table)[names(table) == input$medal_select]) +
     xlab("Anzahl Athleten") +
     #labs(caption = "Regression via LOESS smoother") +
