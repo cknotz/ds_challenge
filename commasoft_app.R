@@ -50,7 +50,7 @@ ui <- dashboardPage(
                                <a target='_blank'
                                href='https://en.wikipedia.org/wiki/2016_Summer_Olympics_medal_table#Medal_table'>
                                Quelle für die Zahl der Medaillen</a>). Bei der Zahl der Athleten beschränke ich mich auf
-                               die ersten 75 Länder aus 207, um die Graphen lesbar zu halten.</li>
+                               die ersten 75 Länder aus 207, um das Schaubild lesbar zu halten.</li>
                                <li>Der Code, um die Daten von Wikipedia zu 'scrapen' sowie der Code für dieses Dashbord (inkl. der Simulation) sind auf
                                meinem <a href='' target='_blank'>Github Profil</a> hinterlegt.</li>
                                <li>Bei den Antworten auf Frage 3 beziehe ich mich u.a. auf zwei Studien zu Predictive Maintenance
