@@ -23,7 +23,7 @@ ui <- dashboardPage(
           menuItem("Start", tabName = "start", selected = T),
           menuItem("Meine Lösung", tabName = "solu",
           menuSubItem("Aufgabe 1", tabName = "aufg1"), #, icon = icon("chart-bar", lib = "font-awesome")
-          menuSubItem("Aufgabe 2", tabName = "aufg2", selected = T), #, icon = icon("amazon", lib = "font-awesome")
+          menuSubItem("Aufgabe 2", tabName = "aufg2"), #, icon = icon("amazon", lib = "font-awesome")
           menuSubItem("Aufgabe 3", tabName = "aufg3")) #, icon = icon("cogs", lib = "font-awesome")
   )),
   dashboardBody(
@@ -106,7 +106,7 @@ ui <- dashboardPage(
                   box(width = 12, collapsible = F, solidHeader = F,
                       title = "Amazon-Kundenbewertungen",
                       HTML(paste(readLines("www/aufg2_simtext1.html"), collapse="\n"))),
-                      box(width=12, title = "Die Berechnung im Detail", collapsible = T, collapsed = F, solidHeader = F,
+                      box(width=12, title = "Die Berechnung im Detail", collapsible = T, collapsed = T, solidHeader = F,
                       column(width = 12,
                              HTML("<p>Beim exakten Test nach Fisher wird die Wahrscheinlichkeit
                              berechnet, dass eine bestimmte Differenz in einem binären Merkmal (z.B. positiv/negativ) zwischen 
