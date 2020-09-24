@@ -265,17 +265,17 @@ girafe(ggobj = p,
 
 (88/100)-(0/2)
 
-fisher.test(rbind(c(90,2),c(10,0)), alternative="less")
+fisher.test(rbind(c(90,10),c(2,0)), alternative="two.sided")
 
 # by hand:
-one <- (factorial(90+2)*factorial(10+0)*factorial(90+10)*factorial(2+0)) /
+one <- (factorial(90+10)*factorial(2+0)*factorial(90+2)*factorial(10+0)) /
     (factorial(102)*factorial(90)*factorial(2)*factorial(10)*factorial(0)) # observed
 
-two <- (factorial(89+1)*factorial(11+1)*factorial(89+11)*factorial(1+1)) /
-    (factorial(102)*factorial(89)*factorial(1)*factorial(11)*factorial(1)) # one more extreme
+two <- (factorial(91+9)*factorial(1+1)*factorial(91+1)*factorial(9+1)) /
+    (factorial(102)*factorial(91)*factorial(1)*factorial(9)*factorial(1)) # one more extreme
 
-three <- (factorial(88+0)*factorial(12+2)*factorial(88+12)*factorial(0+2)) /
-    (factorial(102)*factorial(88)*factorial(0)*factorial(12)*factorial(2)) # one more extreme
+three <- (factorial(92+8)*factorial(0+2)*factorial(92+0)*factorial(8+2)) /
+    (factorial(102)*factorial(92)*factorial(0)*factorial(8)*factorial(2)) # one more extreme
 
 one+two+three # one sided, also two-sided (R sums probs of all tables with probs <= to observed; here: all!)
 

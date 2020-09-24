@@ -23,7 +23,7 @@ ui <- dashboardPage(
           menuItem("Start", tabName = "start", selected = T),
           menuItem("Meine Lösung", tabName = "solu",
           menuSubItem("Aufgabe 1", tabName = "aufg1"), #, icon = icon("chart-bar", lib = "font-awesome")
-          menuSubItem("Aufgabe 2", tabName = "aufg2"), #, icon = icon("amazon", lib = "font-awesome")
+          menuSubItem("Aufgabe 2", tabName = "aufg2", selected = T), #, icon = icon("amazon", lib = "font-awesome")
           menuSubItem("Aufgabe 3", tabName = "aufg3")) #, icon = icon("cogs", lib = "font-awesome")
   )),
   dashboardBody(
@@ -103,21 +103,83 @@ ui <- dashboardPage(
               )),
           tabItem(tabName = "aufg2",
               fluidRow(
-                  box(width = 12, collapsible = F, solidHeader = T,
+                  box(width = 12, collapsible = F, solidHeader = F,
                       title = "Amazon-Kundenbewertungen",
+                      HTML(paste(readLines("www/aufg2_simtext1.html"), collapse="\n"))),
+                      box(width=12, title = "Die Berechnung im Detail", collapsible = T, collapsed = F, solidHeader = F,
                       column(width = 12,
-                             HTML(paste(readLines("www/aufg2_simtext1.html"), collapse="\n"))),
-                      br(),
-                      br(),
+                             HTML("<p>Beim exakten Test nach Fisher wird die Wahrscheinlichkeit
+                             berechnet, dass eine bestimmte Differenz in einem binären Merkmal (z.B. positiv/negativ) zwischen 
+                             zwei Gruppen beobachtet wird, <i>falls es in Wahrheit keinen wirklichen Unterschied zwischen 
+                             den zwei Gruppen gibt</i>. Anders ausgedrückt berechnet man die Wahrscheinlichkeit, dass die 
+                             beobachteten Werte rein durch Zufall enstanden sein könnten und die Daten keinen tatsächlichen Unterschied 
+                             widerspiegeln.</p>
+                             
+                             <p>Dazu überträgt man zunächst die beobachteten Werte in eine 2x2 Kreuztabelle, wie in 
+                             Tabelle (1) dargestellt.</p>")
+                             ),
+                      column(width = 6,
+                             HTML(readLines("www/tab2.html"))
+                             ),
+                      column(width = 6,
+                             HTML(readLines("www/tab1.html")),
+                             br(),
+                      br()),
                       column(width = 12,
+                             HTML("<p>Die Wahrscheinlichkeit, die in Tabelle (1) dargestellten Werte zu beobachten, lässt
+                                  sich dann mit Hilfe der folgenden Formel direkt berechnen. Die Beobachtungen gehen dabei
+                                  wie in Tabelle (2) gezeigt in die Berechnung ein:</p>"),
+                             withMathJax("$$p = \\frac{(A+B)!(C+D)!(A+C)!(B+D)!}{N!A!B!C!D!}$$"),
+                             HTML("<p>Für die beobachteten Werte ergibt die Berechnung:</p>"),
+                             verbatimTextOutput("fish_1"),
+                             HTML("<p><strong>Die Berechnung ergibt eine geschätzte Wahrscheinlichkeit von rund 80%, dass die beobachtenen
+                                  Werte rein durch Zufall entstanden sind und eigentlich kein Unterschied in den Bewertungen
+                                  von Anbieter A und B besteht.</strong></p>
+                                  <p>In einem zweiten Schritt kann dann noch berechnet werden, mit welcher Wahrscheinlichkeit 
+                                  man in den Daten theoretisch eine im Schnitt bessere Bewertung von Anbieter A beobachtet werden könnte.
+                                  Bei ingesamt 102 Bewertungen, von sich denen 100 auf Anbieter A und 2 auf Anbieter B verteilen,
+                                  ergeben sich zwei Szenarien. Diese sind in Tabellen (3) und (4) dargestellt.</p>"),
+                      column(width = 6,
+                             HTML(readLines("www/tab3.html"))
+                             ),
+                      column(width = 6,
+                             HTML(readLines("www/tab4.html")),
+                             br(),
+                            br()),
+                      column(width = 12,
+                             HTML("<p>In Tabelle (3) wurden beiden Anbietern je eine positive Bewertung abgezogen und als
+                                  negative hinzugerechnet; in Tabelle (4) wurde dies wiederholt. Da Anbieter B über nur zwei 
+                                  Bewertungen verfügt, sind nur diese zwei Alternativen möglich ohne die Gesamtzahl der 
+                                  Bewertungen zu verändern.</p>
+                                  <p>Wendet man die obige Formel hier nochmals an ergeben sich folgende Wahrscheinlichkeiten:</p>")),
+                      column(width=6,
+                             HTML("<strong>Tabelle (3)</strong>"),
+                             verbatimTextOutput("fish_2")),
+                      column(width = 6,
+                             HTML("<strong>Tabelle (4)</strong>"),
+                             verbatimTextOutput("fish_3")),
+                      column(width = 12,
+                             HTML("<p>Die Berechnungen ergeben eine geschätzte Wahrscheinlichkeit von insgesamt rund 18%, bei
+                                  100 Bewertungen für Anbieter A und 2 für Anbieter B die in Tabelle (3) gezeigte Verteilung
+                                  zu beobachten. Die in Tabelle (4) gezeigte Verteilung, in der Anbieter B nur negativ 
+                                  beurteilt wird, ist mit geschätzten 0% extrem unwahrscheinlich.</p>
+                                  
+                                  <p><strong>Die geschätzte Wahrscheinlichkeit, dass Anbieter A besser bewertet sein könnte, liegt damit
+                                  nur bei knapp unter 20%.</strong></p>")
+                             )
+                      )),
+                  box(width=12, collapsible = T, collapsed = T, solidHeader = T,
+                      title = "Die Simulationsanalyse",
+                      column(width = 12,
+                      HTML(paste(readLines("www/sim_old.html"), collapse="\n"))),
                       actionBttn(
                         inputId = "runsim",
-                        label = "Simulation starten", 
+                        label = "Simulation starten",
                         style = "material-flat",
                         color = "danger",
                         size = "xs"),
                       br(),
-                      br(),),
+                      br(),
                       column(width = 6, align = "center",
                       plotOutput("simvals")),
                       column(width = 6, align = "center",
@@ -126,19 +188,12 @@ ui <- dashboardPage(
                             br(),
                             br(),
                             uiOutput("simres1")),
-                      # column(width = 6, align = "center",
-                      #        uiOutput("h1"),
-                      #        uiOutput("simres2")
-                      #        ),
                       column(width = 12, align = "center",
-                             uiOutput("h2"),
                              uiOutput("simres3")
                              ),
                       column(width = 12,
                              uiOutput("simres4")
-                             )
-                      )
-              )),
+                             )))),
           tabItem(tabName = "aufg3",
               fluidRow(
                   box(width = 12,collapsible = F,solidHeader = T,
@@ -292,6 +347,24 @@ girafe(ggobj = p,
           opts_selection(type = "none")))
 })
 
+##### Fisher test
+################
+
+output$fish_1 <- renderText({
+  round((factorial(90+10)*factorial(2+0)*factorial(90+2)*factorial(10+0)) /
+    (factorial(102)*factorial(90)*factorial(2)*factorial(10)*factorial(0)),3)
+})
+
+output$fish_2 <- renderText({
+  round((factorial(91+9)*factorial(1+1)*factorial(91+1)*factorial(9+1)) /
+    (factorial(102)*factorial(91)*factorial(1)*factorial(9)*factorial(1)),3)
+})
+
+output$fish_3 <- renderText({
+  round((factorial(92+8)*factorial(0+2)*factorial(92+0)*factorial(8+2)) /
+    (factorial(102)*factorial(92)*factorial(0)*factorial(8)*factorial(2)),3)
+})
+
 ##### Graph 2.1
 ###############
 
@@ -365,28 +438,8 @@ observeEvent(input$runsim,{
   
   p <- sum(round(null_dist$diff<=0),2)/1000
   
-  output$simp <- renderPrint({
-    cat(p)
-  })
-  
-  output$h2 <- renderUI({
-   tags$b("Aus Fisher-Test berechnete Wahrscheinlichkeit (p-Wert), dass Anb. A nicht besser bewertet wird:") 
-  })
-  
-  fisher <- fisher.test(rbind(c(90,2),c(10,0)), alternative="less")
-  
-  output$fisherp <- renderPrint({
-    cat(round(fisher$p.value,3))
-  })
-  
   output$simres1 <- renderUI({
           HTML(paste(readLines("www/aufg2_simtext2.html"), collapse="\n"))
-  })
-  output$simres3 <- renderUI({
-          verbatimTextOutput("fisherp")
-  })
-  output$simres4 <- renderUI({
-          HTML(paste(readLines("www/aufg2_simtext3.html"), collapse="\n"))
   })
   
   removeModal()
