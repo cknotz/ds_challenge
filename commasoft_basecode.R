@@ -287,6 +287,8 @@ two+three
 # Bayesian
 ##########
 
+set.seed(42)
+
 no_pos <- c(90,2)
 no_eval <- c(100,2)
 
@@ -296,13 +298,39 @@ fit <- bayes.prop.test(no_pos,no_eval)
 
 summary(fit)
 plot(fit)
-diagnostics(fit)
 
-# Extract differences
-model.code(fit)
-  samp_mat <- as.matrix(samples)
-  diff <- samp_mat[, "theta[1]"] - samp_mat[, "theta[2]"]
-  hist(diff)
+s <- as.data.frame(fit)
+s$diff <- s$theta1-s$theta2
+
+  hdi_diff <- bayestestR::ci(diff, method="HDI",ci=0.95)
+  
+  hdi_anbA <- bayestestR::ci(s$theta1, method="HDI",ci=0.95)
+  
+  hdi_anbB <- bayestestR::ci(s$theta2, method="HDI",ci=0.95)
+
+  mean(diff>0)
+  mean(diff<0)  
+
+ggplot(s,aes(x=theta1)) +
+  geom_histogram()  
+
+ggplot(s,aes(x=theta2)) +
+  geom_density()
+
+ggplot(s,aes(x=diff)) +
+  geom_density(color="#c2224a", fill="#c2224a", alpha=.5) +
+  geom_vline(xintercept = median(s$diff), linetype="dashed", size=0.25) +
+  geom_segment(aes(x=hdi_diff$CI_low,xend=hdi_diff$CI_high,y=0.02,yend=0.02), size = 0.25) +
+  annotate(geom="text",x=hdi_diff$CI_low,y=0.1,label=as.character(round(hdi_diff$CI_low,2))) +
+  annotate(geom="text",x=hdi_diff$CI_high,y=0.1,label=as.character(round(hdi_diff$CI_high,2))) +
+  scale_x_continuous(breaks = seq(-.2,0.9,0.1)) +
+  scale_y_continuous(expand = c(0,0),limits = c(0,2.75), breaks = seq(0,2.5,0.5)) +  
+  xlab("Differenz im Anteil pos. Bewertungen (Anb.A - Anb. B)") +
+  ylab("Dichte") +
+  theme_bw() +
+    theme(panel.grid = element_blank())
+  
+
 
 # Simulation I 
 ##############
