@@ -265,7 +265,7 @@ girafe(ggobj = p,
 
 (88/100)-(0/2)
 
-fisher.test(rbind(c(90,10),c(2,0)), alternative="two.sided")
+fisher.test(rbind(c(90,10),c(2,0)), alternative="less")
 
 # by hand:
 one <- (factorial(90+10)*factorial(2+0)*factorial(90+2)*factorial(10+0)) /

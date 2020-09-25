@@ -100,11 +100,22 @@ ui <- dashboardPage(
               fluidRow(
                   box(width = 12, collapsible = F, solidHeader = F,
                       title = "Amazon-Kundenbewertungen",
-                      actionBttn(inputId = "runsim",label = "Berechnen"),
+                      HTML(readLines("www/bayes_intro.html")),
+                      column(width=4,
+                      actionBttn(
+                        inputId = "runsim",
+                        label = "Test berechnen",
+                        style = "material-flat",
+                        color = "danger",
+                        size = "xs"),
+                      br(),
+                      br()),
+                      column(width = 12,
+                            uiOutput("bayestext1"),
                       column(width = 5,
                              plotOutput("anbA")),
                       column(width = 5,
-                             plotOutput("anbB")),
+                             plotOutput("anbB"))),
                       column(width=10,
                              plotOutput("diffplot"))
                       ))),
@@ -289,6 +300,7 @@ observeEvent(input$runsim,{
       scale_y_continuous(expand = c(0,0),limits = c(0,2.75), breaks = seq(0,2.5,0.5)) +  
       xlab("Differenz im Anteil pos. Bewertungen (Anb.A - Anb. B)") +
       ylab("Dichte") +
+      labs(title = "(3)") +
       theme_bw() +
         theme(panel.grid = element_blank())
   })
@@ -303,6 +315,7 @@ observeEvent(input$runsim,{
       scale_y_continuous(expand = c(0,0),limits = c(0,16), breaks = seq(0,15,5)) + 
       xlab("Anteil pos. Bewertungen für Anbieter A") +
       ylab("Dichte") +
+      labs(title = "(1)") +
       theme_bw() +
         theme(panel.grid = element_blank()) 
   })
@@ -318,8 +331,13 @@ observeEvent(input$runsim,{
       scale_x_continuous(breaks = seq(0,1,0.1)) +
       xlab("Anteil pos. Bewertungen für Anbieter B") +
       ylab("Dichte") +
+      labs(title = "(2)") +
       theme_bw() +
         theme(panel.grid = element_blank())
+  })
+  
+  output$bayestext1 <- renderUI({
+    HTML(readLines("www/bayestext1.html"))
   })
   
 })
@@ -328,20 +346,11 @@ observeEvent(input$runsim,{
 ##### Fisher test
 ################
 
-output$fish_1 <- renderText({
+output$fish <- renderText({
   round((factorial(90+10)*factorial(2+0)*factorial(90+2)*factorial(10+0)) /
     (factorial(102)*factorial(90)*factorial(2)*factorial(10)*factorial(0)),3)
 })
 
-output$fish_2 <- renderText({
-  round((factorial(91+9)*factorial(1+1)*factorial(91+1)*factorial(9+1)) /
-    (factorial(102)*factorial(91)*factorial(1)*factorial(9)*factorial(1)),3)
-})
-
-output$fish_3 <- renderText({
-  round((factorial(92+8)*factorial(0+2)*factorial(92+0)*factorial(8+2)) /
-    (factorial(102)*factorial(92)*factorial(0)*factorial(8)*factorial(2)),3)
-})
 
 }
 
