@@ -11,19 +11,14 @@ library(ggiraph)
 table <- readRDS("www/backup.rds")
 names(table)[names(table)=="Total"] <- "Gesamt"
 
-# paste(readLines("www/tab1.html"), collapse="\n")
-# paste(readLines("www/tab2.html"), collapse="\n")
-# paste(readLines("www/tab3.html"), collapse="\n")
-# paste(readLines("www/tab4.html"), collapse="\n")
-
 ui <- dashboardPage(
   dashboardHeader(title = "Data Science Challenge", titleWidth = 300),
   dashboardSidebar(
       sidebarMenu(
-          menuItem("Start", tabName = "start", selected = T),
+          menuItem("Start", tabName = "start"),
           menuItem("Meine Lösung", tabName = "solu",
           menuSubItem("Aufgabe 1", tabName = "aufg1"), #, icon = icon("chart-bar", lib = "font-awesome")
-          menuSubItem("Aufgabe 2", tabName = "aufg2"), #, icon = icon("amazon", lib = "font-awesome")
+          menuSubItem("Aufgabe 2", tabName = "aufg2", selected = T), #, icon = icon("amazon", lib = "font-awesome")
           menuSubItem("Aufgabe 3", tabName = "aufg3")) #, icon = icon("cogs", lib = "font-awesome")
   )),
   dashboardBody(
@@ -105,95 +100,14 @@ ui <- dashboardPage(
               fluidRow(
                   box(width = 12, collapsible = F, solidHeader = F,
                       title = "Amazon-Kundenbewertungen",
-                      HTML(paste(readLines("www/aufg2_simtext1.html"), collapse="\n"))),
-                      box(width=12, title = "Die Berechnung im Detail", collapsible = T, collapsed = T, solidHeader = F,
-                      column(width = 12,
-                             HTML("<p>Beim exakten Test nach Fisher wird die Wahrscheinlichkeit
-                             berechnet, dass eine bestimmte Differenz in einem binären Merkmal (z.B. positiv/negativ) zwischen 
-                             zwei Gruppen beobachtet wird, <i>falls es in Wahrheit keinen wirklichen Unterschied zwischen 
-                             den zwei Gruppen gibt</i>. Anders ausgedrückt berechnet man die Wahrscheinlichkeit, dass die 
-                             beobachteten Werte rein durch Zufall enstanden sein könnten und die Daten keinen tatsächlichen Unterschied 
-                             widerspiegeln.</p>
-                             
-                             <p>Dazu überträgt man zunächst die beobachteten Werte in eine 2x2 Kreuztabelle, wie in 
-                             Tabelle (1) dargestellt.</p>")
-                             ),
-                      column(width = 6,
-                             HTML(readLines("www/tab2.html"))
-                             ),
-                      column(width = 6,
-                             HTML(readLines("www/tab1.html")),
-                             br(),
-                      br()),
-                      column(width = 12,
-                             HTML("<p>Die Wahrscheinlichkeit, die in Tabelle (1) dargestellten Werte zu beobachten, lässt
-                                  sich dann mit Hilfe der folgenden Formel direkt berechnen. Die Beobachtungen gehen dabei
-                                  wie in Tabelle (2) gezeigt in die Berechnung ein:</p>"),
-                             withMathJax("$$p = \\frac{(A+B)!(C+D)!(A+C)!(B+D)!}{N!A!B!C!D!}$$"),
-                             HTML("<p>Für die beobachteten Werte ergibt die Berechnung:</p>"),
-                             verbatimTextOutput("fish_1"),
-                             HTML("<p><strong>Die Berechnung ergibt eine geschätzte Wahrscheinlichkeit von rund 80%, dass die beobachtenen
-                                  Werte rein durch Zufall entstanden sind und eigentlich kein Unterschied in den Bewertungen
-                                  von Anbieter A und B besteht.</strong></p>
-                                  <p>In einem zweiten Schritt kann dann noch berechnet werden, mit welcher Wahrscheinlichkeit 
-                                  man in den Daten theoretisch eine im Schnitt bessere Bewertung von Anbieter A beobachtet werden könnte.
-                                  Bei ingesamt 102 Bewertungen, von sich denen 100 auf Anbieter A und 2 auf Anbieter B verteilen,
-                                  ergeben sich zwei Szenarien. Diese sind in Tabellen (3) und (4) dargestellt.</p>"),
-                      column(width = 6,
-                             HTML(readLines("www/tab3.html"))
-                             ),
-                      column(width = 6,
-                             HTML(readLines("www/tab4.html")),
-                             br(),
-                            br()),
-                      column(width = 12,
-                             HTML("<p>In Tabelle (3) wurden beiden Anbietern je eine positive Bewertung abgezogen und als
-                                  negative hinzugerechnet; in Tabelle (4) wurde dies wiederholt. Da Anbieter B über nur zwei 
-                                  Bewertungen verfügt, sind nur diese zwei Alternativen möglich ohne die Gesamtzahl der 
-                                  Bewertungen zu verändern.</p>
-                                  <p>Wendet man die obige Formel hier nochmals an ergeben sich folgende Wahrscheinlichkeiten:</p>")),
-                      column(width=6,
-                             HTML("<strong>Tabelle (3)</strong>"),
-                             verbatimTextOutput("fish_2")),
-                      column(width = 6,
-                             HTML("<strong>Tabelle (4)</strong>"),
-                             verbatimTextOutput("fish_3")),
-                      column(width = 12,
-                             HTML("<p>Die Berechnungen ergeben eine geschätzte Wahrscheinlichkeit von insgesamt rund 18%, bei
-                                  100 Bewertungen für Anbieter A und 2 für Anbieter B die in Tabelle (3) gezeigte Verteilung
-                                  zu beobachten. Die in Tabelle (4) gezeigte Verteilung, in der Anbieter B nur negativ 
-                                  beurteilt wird, ist mit geschätzten 0% extrem unwahrscheinlich.</p>
-                                  
-                                  <p><strong>Die geschätzte Wahrscheinlichkeit, dass Anbieter A besser bewertet sein könnte, liegt damit
-                                  nur bei knapp unter 20%.</strong></p>")
-                             )
-                      )),
-                  box(width=12, collapsible = T, collapsed = T, solidHeader = T,
-                      title = "Die Simulationsanalyse",
-                      column(width = 12,
-                      HTML(paste(readLines("www/sim_old.html"), collapse="\n"))),
-                      actionBttn(
-                        inputId = "runsim",
-                        label = "Simulation starten",
-                        style = "material-flat",
-                        color = "danger",
-                        size = "xs"),
-                      br(),
-                      br(),
-                      column(width = 6, align = "center",
-                      plotOutput("simvals")),
-                      column(width = 6, align = "center",
-                      plotOutput("simdiffs")),
-                      column(width = 12,
-                            br(),
-                            br(),
-                            uiOutput("simres1")),
-                      column(width = 12, align = "center",
-                             uiOutput("simres3")
-                             ),
-                      column(width = 12,
-                             uiOutput("simres4")
-                             )))),
+                      actionBttn(inputId = "runsim",label = "Berechnen"),
+                      column(width = 5,
+                             plotOutput("anbA")),
+                      column(width = 5,
+                             plotOutput("anbB")),
+                      column(width=10,
+                             plotOutput("diffplot"))
+                      ))),
           tabItem(tabName = "aufg3",
               fluidRow(
                   box(width = 12,collapsible = F,solidHeader = T,
@@ -347,6 +261,70 @@ girafe(ggobj = p,
           opts_selection(type = "none")))
 })
 
+##### Graph 2.1
+###############
+
+observeEvent(input$runsim,{
+  
+  set.seed(42)
+  no_pos <- c(90,2)
+  no_eval <- c(100,2)
+  
+  fit <- bayes.prop.test(no_pos,no_eval)
+  
+  s <- as.data.frame(fit)
+  s$diff <- s$theta1-s$theta2
+  hdi_diff <- bayestestR::ci(s$diff, method="HDI",ci=0.95)
+  hdi_anbA <- bayestestR::ci(s$theta1, method="HDI",ci=0.95)
+  hdi_anbB <- bayestestR::ci(s$theta2, method="HDI",ci=0.95)
+  
+  output$diffplot <- renderPlot({
+    ggplot(s,aes(x=diff)) +
+      geom_density(color="#c2224a", fill="#c2224a", alpha=.5) +
+      geom_vline(xintercept = median(s$diff), linetype="dashed", size=0.25) +
+      geom_segment(aes(x=hdi_diff$CI_low,xend=hdi_diff$CI_high,y=0.02,yend=0.02), size = 0.25) +
+      annotate(geom="text",x=hdi_diff$CI_low,y=0.1,label=as.character(round(hdi_diff$CI_low,2))) +
+      annotate(geom="text",x=hdi_diff$CI_high,y=0.1,label=as.character(round(hdi_diff$CI_high,2))) +
+      scale_x_continuous(breaks = seq(-0.2,0.9,0.1), limits = c(-0.25,0.95)) +
+      scale_y_continuous(expand = c(0,0),limits = c(0,2.75), breaks = seq(0,2.5,0.5)) +  
+      xlab("Differenz im Anteil pos. Bewertungen (Anb.A - Anb. B)") +
+      ylab("Dichte") +
+      theme_bw() +
+        theme(panel.grid = element_blank())
+  })
+  
+  output$anbA <- renderPlot({
+    ggplot(s,aes(x=theta1)) +
+      geom_density(color="#585858", fill="#585858", alpha=.5) +
+      geom_vline(xintercept = median(s$theta1), linetype="dashed", size=0.25) +
+      geom_segment(aes(x=hdi_anbA$CI_low,xend=hdi_anbA$CI_high,y=0.075,yend=0.075), size = 0.25) +
+      annotate(geom="text",x=hdi_anbA$CI_low,y=0.5,label=as.character(round(hdi_anbA$CI_low,2))) +
+      annotate(geom="text",x=hdi_anbA$CI_high,y=0.5,label=as.character(round(hdi_anbA$CI_high,2))) +
+      scale_y_continuous(expand = c(0,0),limits = c(0,16), breaks = seq(0,15,5)) + 
+      xlab("Anteil pos. Bewertungen für Anbieter A") +
+      ylab("Dichte") +
+      theme_bw() +
+        theme(panel.grid = element_blank()) 
+  })
+  
+  output$anbB <- renderPlot({
+    ggplot(s,aes(x=theta2)) +
+      geom_density(color="#585858", fill="#585858", alpha=.5) +
+      geom_vline(xintercept = median(s$theta2), linetype="dashed", size=0.25) +
+      geom_segment(aes(x=hdi_anbB$CI_low,xend=hdi_anbB$CI_high,y=0.075,yend=0.075), size = 0.25) +
+      annotate(geom="text",x=hdi_anbB$CI_low,y=0.135,label=as.character(round(hdi_anbB$CI_low,2))) +
+      annotate(geom="text",x=hdi_anbB$CI_high,y=0.135,label=as.character(round(hdi_anbB$CI_high,2))) +
+      scale_y_continuous(expand = c(0,0),limits = c(0,2.95), breaks = seq(0,2.75,0.5)) + 
+      scale_x_continuous(breaks = seq(0,1,0.1)) +
+      xlab("Anteil pos. Bewertungen für Anbieter B") +
+      ylab("Dichte") +
+      theme_bw() +
+        theme(panel.grid = element_blank())
+  })
+  
+})
+
+
 ##### Fisher test
 ################
 
@@ -363,86 +341,6 @@ output$fish_2 <- renderText({
 output$fish_3 <- renderText({
   round((factorial(92+8)*factorial(0+2)*factorial(92+0)*factorial(8+2)) /
     (factorial(102)*factorial(92)*factorial(0)*factorial(8)*factorial(2)),3)
-})
-
-##### Graph 2.1
-###############
-
-observeEvent(input$runsim,{
-  print("blork")
-  
-  showModal(modalDialog("Simulation läuft...", footer=NULL)) 
-  
-  # Generate dataset
-  df <- data.frame(anb = c(replicate(100, "Anbieter A"),replicate(2, "Anbieter B")),
-                 eval = c(c(replicate(90,1),replicate(10,0)),c(1,1)))
-  
-  # Storing proportions
-  sum <- df %>% 
-    group_by(anb) %>% 
-    summarize(positive = mean(eval == 1),
-      sample_size = n())
-
-  phat_A <- sum$positive[1]
-  phat_B <- sum$positive[2]
-  n_A <- sum$sample_size[1]
-  n_B <- sum$sample_size[2]
-  obs_diff <- phat_A - phat_B
-  
-  set.seed(17)
-  
-  shuffles <- mosaic::do(1000) *
-    (df %>% 
-         mutate(anb = mosaic::shuffle(anb)) %>% 
-         group_by(anb) %>% 
-         summarize(positive = mean(eval == 1)))
-  
-  output$simvals <- renderPlot({
-    ggplot(shuffles, aes(x=anb,y=positive)) +
-    geom_jitter(alpha=.2, width = 0.25, size = 2,color = "#c2224a") +
-    scale_y_continuous(breaks = seq(0,1,.1)) +
-    ylab("Anteil positive Bewertungen") +
-    xlab("") +
-    labs(title = "(1)",
-         caption = "Die Daten sind zur besseren Lesbarkeit leicht gestreut.") +
-    theme_bw() +
-    theme(legend.position = "bottom",
-          legend.title = element_blank(),
-          panel.grid.major.x = element_line(color = "gray", size = .2),
-          panel.grid.major.y = element_blank(),
-          plot.caption = element_text(size = 7))
-    
-  })
-  
-  null_dist <- shuffles %>% 
-    group_by(.index) %>% 
-    summarize(diff = -diff(positive)) # negative of difference to obtain same sign as diff A-B
-  
-  output$simdiffs <- renderPlot({
-  ggplot(null_dist, aes(x = diff)) +
-    geom_histogram(color = "white", fill = "#c2224a") +
-    scale_y_continuous(expand = c(0, 0),
-                       limits = c(0,1000),
-                       breaks = seq(0,1000,200)) +
-    scale_x_continuous(breaks = seq(-0.2,1,.1)) +
-    ylab("Häufigkeit") +
-    xlab("Differenz im Anteil der positiven Bewertungen (Anb. A - Anb. B)") +
-    labs(title = "(2)") +
-    theme_bw() +
-    theme(legend.position = "bottom",
-          legend.title = element_blank(),
-          panel.grid.major.x = element_line(color = "gray", size = .2),
-          panel.grid.major.y = element_blank())
-  
-  })
-  
-  p <- sum(round(null_dist$diff<=0),2)/1000
-  
-  output$simres1 <- renderUI({
-          HTML(paste(readLines("www/aufg2_simtext2.html"), collapse="\n"))
-  })
-  
-  removeModal()
 })
 
 }
