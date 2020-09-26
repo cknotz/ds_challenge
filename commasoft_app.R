@@ -15,10 +15,10 @@ ui <- dashboardPage(
   dashboardHeader(title = "Data Science Challenge", titleWidth = 300),
   dashboardSidebar(
       sidebarMenu(
-          menuItem("Start", tabName = "start"),
+          menuItem("Start", tabName = "start", selected = T),
           menuItem("Meine Lösung", tabName = "solu",
           menuSubItem("Aufgabe 1", tabName = "aufg1"), #, icon = icon("chart-bar", lib = "font-awesome")
-          menuSubItem("Aufgabe 2", tabName = "aufg2", selected = T), #, icon = icon("amazon", lib = "font-awesome")
+          menuSubItem("Aufgabe 2", tabName = "aufg2"), #, icon = icon("amazon", lib = "font-awesome")
           menuSubItem("Aufgabe 3", tabName = "aufg3")) #, icon = icon("cogs", lib = "font-awesome")
   )),
   dashboardBody(
@@ -46,7 +46,7 @@ ui <- dashboardPage(
                                href='https://en.wikipedia.org/wiki/2016_Summer_Olympics_medal_table#Medal_table'>
                                Quelle für die Zahl der Medaillen</a>). Bei der Zahl der Athleten beschränke ich mich auf
                                die ersten 75 Länder aus 207, um das Schaubild lesbar zu halten.</li>
-                               <li>Der Code, um die Daten von Wikipedia zu 'scrapen' sowie der Code für dieses Dashbord (inkl. der Simulation) sind auf
+                               <li>Der Code, um die Daten von Wikipedia zu 'scrapen' sowie der Code für dieses Dashbord (inkl. der bayesianischen Schätzung für Aufg. 2) sind auf
                                meinem <a href='' target='_blank'>Github Profil</a> hinterlegt.</li>
                                <li>Bei den Antworten auf Frage 3 beziehe ich mich u.a. auf zwei Studien zu Predictive Maintenance
                                Praktiken von PricewaterhouseCoopers (<a target='_blank href='https://www.pwc.nl/nl/assets/documents/pwc-predictive-maintenance-4-0.pdf'>2017</a>; <a target='_blank'
@@ -104,7 +104,7 @@ ui <- dashboardPage(
                       column(width=4,
                       actionBttn(
                         inputId = "runsim",
-                        label = "Test berechnen",
+                        label = "Schätzung ausführen",
                         style = "material-flat",
                         color = "danger",
                         size = "xs"),
@@ -112,12 +112,18 @@ ui <- dashboardPage(
                       br()),
                       column(width = 12,
                             uiOutput("bayestext1"),
-                      column(width = 5,
+                      column(width = 6,
                              plotOutput("anbA")),
-                      column(width = 5,
-                             plotOutput("anbB"))),
+                      column(width = 6,
+                             plotOutput("anbB"),
+                             br()),
+                            uiOutput("bayestext2")),
                       column(width=10,
-                             plotOutput("diffplot"))
+                             plotOutput("diffplot"),
+                             br()),
+                      column(width = 12,
+                             uiOutput("bayestext3")
+                             )
                       ))),
           tabItem(tabName = "aufg3",
               fluidRow(
@@ -272,8 +278,8 @@ girafe(ggobj = p,
           opts_selection(type = "none")))
 })
 
-##### Graph 2.1
-###############
+##### Graphs 2.1-3
+##################
 
 observeEvent(input$runsim,{
   
@@ -289,13 +295,17 @@ observeEvent(input$runsim,{
   hdi_anbA <- bayestestR::ci(s$theta1, method="HDI",ci=0.95)
   hdi_anbB <- bayestestR::ci(s$theta2, method="HDI",ci=0.95)
   
+  print(mean(s$diff>0))
+  
   output$diffplot <- renderPlot({
     ggplot(s,aes(x=diff)) +
-      geom_density(color="#c2224a", fill="#c2224a", alpha=.5) +
+      geom_density(color="#c2224a", fill="#c2224a", alpha=.25) +
       geom_vline(xintercept = median(s$diff), linetype="dashed", size=0.25) +
       geom_segment(aes(x=hdi_diff$CI_low,xend=hdi_diff$CI_high,y=0.02,yend=0.02), size = 0.25) +
       annotate(geom="text",x=hdi_diff$CI_low,y=0.1,label=as.character(round(hdi_diff$CI_low,2))) +
       annotate(geom="text",x=hdi_diff$CI_high,y=0.1,label=as.character(round(hdi_diff$CI_high,2))) +
+      annotate(geom = "text", x=median(s$diff)-0.025, y=1.5, label=as.character(round(median(s$diff),2))) +
+      annotate(geom = "label", x= .7, y=2.25,  label = paste0("p(Diff. > 0) = ",as.character(round(mean(s$diff>0),3)))) +
       scale_x_continuous(breaks = seq(-0.2,0.9,0.1), limits = c(-0.25,0.95)) +
       scale_y_continuous(expand = c(0,0),limits = c(0,2.75), breaks = seq(0,2.5,0.5)) +  
       xlab("Differenz im Anteil pos. Bewertungen (Anb.A - Anb. B)") +
@@ -307,12 +317,14 @@ observeEvent(input$runsim,{
   
   output$anbA <- renderPlot({
     ggplot(s,aes(x=theta1)) +
-      geom_density(color="#585858", fill="#585858", alpha=.5) +
+      geom_density(color="#585858", fill="#585858", alpha=.25) +
       geom_vline(xintercept = median(s$theta1), linetype="dashed", size=0.25) +
       geom_segment(aes(x=hdi_anbA$CI_low,xend=hdi_anbA$CI_high,y=0.075,yend=0.075), size = 0.25) +
-      annotate(geom="text",x=hdi_anbA$CI_low,y=0.5,label=as.character(round(hdi_anbA$CI_low,2))) +
-      annotate(geom="text",x=hdi_anbA$CI_high,y=0.5,label=as.character(round(hdi_anbA$CI_high,2))) +
+      annotate(geom="text",x=hdi_anbA$CI_low,y=0.5,label=as.character(round(hdi_anbA$CI_low,2)),color="#c2224a") +
+      annotate(geom="text",x=hdi_anbA$CI_high,y=0.5,label=as.character(round(hdi_anbA$CI_high,2)),color="#c2224a") +
+      annotate(geom = "text", x=median(s$theta1)-0.05, y=7.5, label=as.character(round(median(s$theta1),2))) +
       scale_y_continuous(expand = c(0,0),limits = c(0,16), breaks = seq(0,15,5)) + 
+      scale_x_continuous(breaks = seq(0,1,0.1), limits = c(0,1)) +
       xlab("Anteil pos. Bewertungen für Anbieter A") +
       ylab("Dichte") +
       labs(title = "(1)") +
@@ -325,9 +337,10 @@ observeEvent(input$runsim,{
       geom_density(color="#585858", fill="#585858", alpha=.5) +
       geom_vline(xintercept = median(s$theta2), linetype="dashed", size=0.25) +
       geom_segment(aes(x=hdi_anbB$CI_low,xend=hdi_anbB$CI_high,y=0.075,yend=0.075), size = 0.25) +
-      annotate(geom="text",x=hdi_anbB$CI_low,y=0.135,label=as.character(round(hdi_anbB$CI_low,2))) +
-      annotate(geom="text",x=hdi_anbB$CI_high,y=0.135,label=as.character(round(hdi_anbB$CI_high,2))) +
-      scale_y_continuous(expand = c(0,0),limits = c(0,2.95), breaks = seq(0,2.75,0.5)) + 
+      annotate(geom="text",x=hdi_anbB$CI_low,y=0.5,label=as.character(round(hdi_anbB$CI_low,2)),color="#c2224a") +
+      annotate(geom="text",x=hdi_anbB$CI_high,y=0.5,label=as.character(round(hdi_anbB$CI_high,2)),color="#c2224a") +
+      annotate(geom = "text", x=median(s$theta2)-0.05, y=7.5, label=as.character(round(median(s$theta2),2))) +
+      scale_y_continuous(expand = c(0,0),limits = c(0,16), breaks = seq(0,15,5)) +
       scale_x_continuous(breaks = seq(0,1,0.1)) +
       xlab("Anteil pos. Bewertungen für Anbieter B") +
       ylab("Dichte") +
@@ -340,15 +353,14 @@ observeEvent(input$runsim,{
     HTML(readLines("www/bayestext1.html"))
   })
   
-})
-
-
-##### Fisher test
-################
-
-output$fish <- renderText({
-  round((factorial(90+10)*factorial(2+0)*factorial(90+2)*factorial(10+0)) /
-    (factorial(102)*factorial(90)*factorial(2)*factorial(10)*factorial(0)),3)
+  output$bayestext2 <- renderUI({
+    HTML(readLines("www/bayestext2.html"))
+  })
+  
+  output$bayestext3 <- renderUI({
+    HTML(readLines("www/bayestext3.html"))
+  })
+  
 })
 
 

@@ -307,8 +307,26 @@ s$diff <- s$theta1-s$theta2
   
   hdi_anbB <- bayestestR::ci(s$theta2, method="HDI",ci=0.95)
 
-  mean(diff>0)
-  mean(diff<0)  
+  mean(s$diff>0)
+  mean(s$diff<0)  
+  
+  
+  # ROPE
+  mean(abs((s$theta1 - s$theta2)) < 0.025)
+
+s %>% 
+  select(theta1, theta2) %>% 
+  pivot_longer(cols = everything(),
+               values_to="theta",
+               names_to = "type") %>% 
+  ggplot(aes(x=theta, fill = type)) +
+    geom_density(alpha = 0.25) +
+    theme_bw() +
+    theme(panel.grid = element_blank(),
+      legend.position = "bottom")
+    
+
+
 
 ggplot(s,aes(x=theta1)) +
   geom_density(color="#585858", fill="#585858", alpha=.5) +

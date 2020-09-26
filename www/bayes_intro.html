@@ -1,13 +1,20 @@
 <p>
-  Die Wahrscheinlichkeit, dass Anbieter A zuverlässiger ist und daher systematisch besser bewertet wird als Anbieter B, lässt sich am Direktesten über einen Bayesianischen Schätzer (<a target='blank'
-  href='https://jkkweb.sitehost.iu.edu/articles/Kruschke2013JEPG.pdf'>vgl. Kruschke 2013</a>) berechnen.
+  Die Wahrscheinlichkeit, dass Anbieter A zuverlässiger ist und daher systematisch besser bewertet wird als Anbieter B, lässt sich am Direktesten über einen bayesianischen Schätzer berechnen. <strong>Die Schätzung ergibt eine Wahrscheinlichkeit von rund 71%, dass Anbieter A besser bewertet wird. Allerdings ist die Schätzung ungenau, und es lässt sich weder ausschließen, dass kein Unterschied besteht nocht, dass Anbieter B doch besser bewertet wird.</strong>
 </p>
 
 <p>
-  Der wesentliche Vorteil des Bayesianischen Ansatzes ist hier, dass damit wirklich direkt die Wahrscheinlichkeit berechnet werden kann, dass Anbieter A <i>besser</i> bewertet wird als Anbieter B. Ein klassischer ('frequentistischer') Schätzer wie der exakte Test nach Fisher würde im Gegensatz nur testen, ob anhand der Daten ausgeschlossen werden kann, dass beide Anbieter gleich gut oder schlecht bewertet werden.
+  Ich verwende hier einen bayesianischen Schätzer, weil damit wirklich direkt die Wahrscheinlichkeit berechnet werden kann, dass Anbieter A <i>besser</i> bewertet wird als Anbieter B. Ein klassischer ('frequentistischer') Schätzer wie der (hier theoretisch zu verwendende) exakte Test nach Fisher würde im Gegensatz nur testen, ob anhand der Daten ausgeschlossen werden kann, dass eigentlich kein Unterschied in den Bewertungen vorliegt.
 </p>
 
 <p>
-  Für den Test verwende ich den <code>bayes.prop.test()</code>(<a target='_blank' href='http://www.sumsar.net/blog/2014/06/bayesian-first-aid-prop-test/'>Dokumentation</a>)
-  in <code>R</code>. Die Berechnung kann über den Button unten gestartet werden.
+  Für den Test verwende ich den <code>bayes.prop.test()</code> Algorithmus in <code>R</code>. Dieser schätzt Populationsanteile und Unterschiede in Anteilen zwischen Gruppen, indem ausgehend von den ursprünglichen Daten und unter Anwendung von Bayes' Regel über eine Markov Chain Monte Carlo Simulation eine hohe Anzahl von plausiblen Schätzwerten generiert wird (siehe auch <a target='_blank' href='http://www.sumsar.net/blog/2014/06/bayesian-first-aid-prop-test/'> Bååth 2014</a>; <a target='blank'
+  href='https://jkkweb.sitehost.iu.edu/articles/Kruschke2013JEPG.pdf'>Kruschke 2013</a>; die a-priori Verteilung ist hier die uninformative Beta-Verteilung (Beta(1,1)), wie bei der Bayesianischen Schätzung von Anteilswerten üblich).
 </p>
+
+<p>
+  Aus der Verteilung der Schätzwerte lässt sich dann direkt ablesen, welche Anteile an positiven Bewertungen jeder Anbieter wahrscheinlich wirklich erhält und mit welcher Wahrscheinlichkeit der Anteil eines Anbieters wirklich höher ist, als der des anderen.
+</p>
+
+  <p>
+  Die Schätzung kann über den Button unten gestartet werden.
+  </p>
