@@ -7,6 +7,8 @@ library(shinyWidgets)
 library(ggplot2)
 library(tidyverse)
 library(ggiraph)
+library(BayesianFirstAid)
+library(bayestestR)
 
 table <- readRDS("www/backup.rds")
 names(table)[names(table)=="Total"] <- "Gesamt"
@@ -33,28 +35,26 @@ ui <- dashboardPage(
       tabItems(
           tabItem(tabName = "start",
                   fluidRow(
-                      box(width = 12, collapsible = F,solidHeader = T,
-                          HTML("<p><strong>Herausforderungen stelle ich mich immer gerne.</strong></p>
-                               <p>Meine Lösungen für die drei Aufgaben stelle ich Ihnen über dieses interaktive Dashboard vor.</p>
+                      box(width = 12, collapsible = F,solidHeader = T, #<p><strong>Herausforderungen stelle ich mich immer gerne.</strong></p>
+                          HTML("<p>Meine Lösungen für die drei Aufgaben stelle ich Ihnen über dieses interaktive Dashboard vor.</p>
                                <p>Zu meinen Lösungen:
                                <ul>
                                <li>Die Daten zur Zahl der Athleten und der gewonnenen Medaillen bei den Olympischen 
-                               Sommerspielen 2016 habe ich direkt von Wikipedia 'gescraped'
-                               (<a target='_blank'
+                               Sommerspielen 2016 habe ich direkt von Wikipedia eingelesen ('gescraped'; <a target='_blank'
                                href='https://en.wikipedia.org/wiki/2016_Summer_Olympics#Number_of_athletes_by_National_Olympic_Committee'>Quelle für die Zahl der Athleten</a>; 
                                <a target='_blank'
                                href='https://en.wikipedia.org/wiki/2016_Summer_Olympics_medal_table#Medal_table'>
                                Quelle für die Zahl der Medaillen</a>). Bei der Zahl der Athleten beschränke ich mich auf
                                die ersten 75 Länder aus 207, um das Schaubild lesbar zu halten.</li>
-                               <li>Der Code, um die Daten von Wikipedia zu 'scrapen' sowie der Code für dieses Dashbord (inkl. der bayesianischen Schätzung für Aufg. 2) sind auf
+                               <li>Der Code, um die Daten von Wikipedia einzulesen sowie der Code für dieses Dashbord (inkl. der bayesianischen Schätzung für Aufg. 2) sind auf
                                meinem <a href='' target='_blank'>Github Profil</a> hinterlegt.</li>
                                <li>Bei den Antworten auf Frage 3 beziehe ich mich u.a. auf zwei Studien zu Predictive Maintenance
                                Praktiken von PricewaterhouseCoopers (<a target='_blank href='https://www.pwc.nl/nl/assets/documents/pwc-predictive-maintenance-4-0.pdf'>2017</a>; <a target='_blank'
                                href='https://www.mainnovation.com/wp-content/uploads/tmp/6397245268d8d3711c88cda0b4585ab02e612f2e.pdf'>2018</a>).
                                </li>
                                </ul>
-                               Mir hat die Challenge viel Spaß gemacht, und ich hoffe natürlich, dass Sie meine Antworten überzeugen.
-                               Mein genaues Vorgehen und die Resultate bespreche ich natürlich sehr gerne näher mit Ihnen in einem persönlichen Gespräch.
+                               Mir hat die Challenge viel Spaß gemacht und ich hoffe natürlich, dass Sie meine Antworten überzeugen.
+                               Mein genaues Vorgehen und die Resultate bespreche ich sehr gerne näher mit Ihnen in einem persönlichen Gespräch.
                                </p>
                                <br>
                                <p>Freundliche Grüße</p>
@@ -128,27 +128,26 @@ ui <- dashboardPage(
           tabItem(tabName = "aufg3",
               fluidRow(
                   box(width = 12,collapsible = F,solidHeader = T,
-                      title = "Frage 1: Was ist das primäre Ziel?",
+                      title = "Frage 1: Was ist das primäre Ziel für den Einsatz von Predictive Maintenance Methoden?",
                       HTML("<p>Oft ist das Ziel natürlich, Wartungen zu optimieren und dadurch vorhandenes Equipment 
-                      effizienter zu nutzen. Andere Motive sind allerdings auch denkbar, bspw. Unfallschutz oder 
-                      Qualitätssicherung. Je nach Ziel ändert sich ggf., welche Indikatoren bei der Bewertung von 
+                      effizienter zu nutzen. Andere Motive sind allerdings auch denkbar, beispielsweise Unfallschutz oder 
+                      Qualitätssicherung. Je nach Ziel ändert sich gegebenenfalls, welche Indikatoren beim Training von 
                       Algorithmen angewandt werden. Sollen Wartungen optimiert werden, spielt die Präzision 
                       (die Vermeidung falscher positiver Diagnosen, also von Fehlalarmen) eine zentrale Rolle; 
                       bei der Qualitätssicherung ist die Vermeidung falscher negativer Diagnosen (die Sensitivität) 
                       wichtiger.</p>")),
                   box(width = 12,collapsible = F, solidHeader = T,
-                      title = "Frage 2: Welche IT Ressourcen werden momentan zur Organisation der Instandhaltung angewandt?",
+                      title = "Frage 2: Wie werden die Daten zur Instandhaltung erfasst und gespeichert?",
                       HTML("<p>Viele Firmen verwenden laut der Studie von PWC weiterhin noch Microsoft Excel für die 
-                           Datenbearbeitung rund um die Instandhaltung, andere schon Datenbanksoftware oder 
-                           Statistiksoftware. Je nach dem bisherigen Stand der IT ergibt sich ggf. besonderer Aufwand 
-                           bei der Datenaufbereitung. Außerdem liegt ggf. auch Bedarf an Training in der Datenbearbeitung 
-                           oder Datenanalyse vor.</p>")),
+                           Datenbearbeitung rund um die Instandhaltung, andere dagegen schon Datenbanksoftware. Je weniger
+                           systematisch die Daten erfasst und gespeichert werden, desto größer ist unter Umständen der Aufwand 
+                           bei der Aufbereitung der Daten.</p>")),
                   box(width = 12,collapsible = F,solidHeader = T,
                       title = "Frage 3: Wie viele Fälle von reparaturbedürftigen Fehlfunktionen sind erfasst?",
                       HTML("<p>Um einen Algorithmus zur Vorhersage von Inspektions- und Reparaturbedarf trainieren zu 
                            können, braucht es eine hinreichend große Zahl an bisherigen Fehlfunktionen, die als 
                            Datengrundlage genutzt werden können. Sind diese nicht vorhanden (etwa, weil Equipment schon 
-                           bei frühen Anzeichen abgeschaltet wird), muss ggf. auf Techniken wie Simulationen 
+                           bei frühen Anzeichen abgeschaltet wird), muss vielleicht auf Techniken wie Simulationen 
                            zurückgegriffen werden.</p>"))
               ))
   ))
