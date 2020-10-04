@@ -61,17 +61,17 @@ names(table)[names(table)=="Silver"] <- "Silber"
 url <- "https://en.wikipedia.org/wiki/2016_Summer_Olympics#Number_of_athletes_by_National_Olympic_Committee"
 
 # Fetching page
-athletes <- url %>% 
-    read_html() %>% 
-    html_nodes(xpath = "/html/body/div[3]/div[3]/div[5]/div[1]/table[5]", 
+athletes <- url %>%
+    read_html() %>%
+    html_nodes(xpath = "/html/body/div[3]/div[3]/div[5]/div[1]/table[5]",
                #css = "table.wikitable:nth-child(101)"
-               ) %>% 
+               ) %>%
     #html_table(fill=T)
-    html_text() 
+    html_text()
 
-athletes <- strsplit(athletes, '\n')[[1]] %>% 
-    as.data.frame() %>% 
-    filter(.!="Participating National Olympic Committees" & .!= "") %>% 
+athletes <- strsplit(athletes, '\n')[[1]] %>%
+    as.data.frame() %>%
+    filter(.!="Participating National Olympic Committees" & .!= "") %>%
     rename("entry"= ".")
 
 # Cleaning
@@ -79,11 +79,11 @@ athletes$no <- as.numeric(str_extract(athletes$entry,
               "(\\d+)"))
 athletes$country <- gsub("\\d|[[:punct:]]",
                          "",
-                         athletes$entry) %>% 
+                         athletes$entry) %>%
     trimws(whitespace = "[\\h\\v]")
 athletes$entry <- NULL
 
-rm(url) #remove clutter 
+rm(url) #remove clutter
 
 # Merge & reshape
 #################
@@ -103,7 +103,7 @@ table$country_de <- countrycode(table$country,'country.name','country.name.de')
     table$country_de[which(table$country_de=="Korea, Demokratische Volksrepublik")] <- "Nordkorea"
     table$country_de[which(table$country_de=="Korea, Republik von")] <- "Südkorea"
     table$country_de[which(table$country_de=="Russische Föderation")] <- "Russland"
-    
+
 table$c_abbrev <- countrycode(table$country,'country.name','iso3c')
     # custom names
     table$c_abbrev[which(table$country=="Kosovo")] <- "XK"
@@ -138,7 +138,7 @@ tiptab <- pivot_wider(table[,c("country","medal","count")],
 # Merging
 table <- merge(table,tiptab,by = "country")
     rm(tiptab)
-    
+
 # Factor for graph
 table$medfac <- NA
 table$medfac[table$medal=="Bronze"] <- 1
@@ -157,8 +157,8 @@ tooltip_css <- "background-color:gray;color:white;padding:10px;border-radius:5px
 
 
 # Plot
-p <- table %>% arrange(-table$Total,table$c_abbrev) %>% 
-    slice_head(n=3*20) %>% 
+p <- table %>% arrange(-table$Total,table$c_abbrev) %>%
+    slice_head(n=3*20) %>%
     ggplot(aes(x=reorder(c_abbrev,Total),
                   y=count, fill = medfac)) +
     geom_bar_interactive(position="stack", stat="identity",color = "gray", size=.1,
@@ -192,8 +192,8 @@ girafe(ggobj = p,
           opts_toolbar(saveaspng = FALSE)))
 
 
-p <- table %>% arrange(-no) %>% 
-    slice_head(n=3*50) %>% 
+p <- table %>% arrange(-no) %>%
+    slice_head(n=3*50) %>%
     ggplot(aes(x=reorder(c_abbrev,no),y=no)) +
     geom_bar_interactive(stat = "identity", fill = "#e34a33",
                          aes(tooltip = paste0("<strong>",country_de,"</strong>\n\n",
@@ -220,10 +220,10 @@ girafe(ggobj = p,
           opts_toolbar(saveaspng = FALSE)))
 
 
-p <- table %>% 
-    select(country_de,no,Total,onclick_de,c_abbrev,Bronze,Silber,Gold) %>% 
-    filter(!is.na(Total)) %>% 
-    unique() %>% 
+p <- table %>%
+    select(country_de,no,Total,onclick_de,c_abbrev,Bronze,Silber,Gold) %>%
+    filter(!is.na(Total)) %>%
+    unique() %>%
     ggplot(aes(x=no,y=Silber)) +
     stat_smooth(color = "gray",alpha = .2,linetype = "dashed",size = .5) +
     geom_point_interactive(color = "#e34a33", alpha = .6,size = 3,
@@ -275,29 +275,29 @@ s <- as.data.frame(fit)
 s$diff <- s$theta1-s$theta2
 
   hdi_diff <- bayestestR::ci(s$diff, method="HDI",ci=0.95)
-  
+
   hdi_anbA <- bayestestR::ci(s$theta1, method="HDI",ci=0.95)
-  
+
   hdi_anbB <- bayestestR::ci(s$theta2, method="HDI",ci=0.95)
 
   mean(s$diff>0)
-  mean(s$diff<0)  
-  
-  
+  mean(s$diff<0)
+
+
   # ROPE
   mean(abs((s$theta1 - s$theta2)) < 0.025)
 
-s %>% 
-  select(theta1, theta2) %>% 
+s %>%
+  select(theta1, theta2) %>%
   pivot_longer(cols = everything(),
                values_to="theta",
-               names_to = "type") %>% 
+               names_to = "type") %>%
   ggplot(aes(x=theta, fill = type)) +
     geom_density(alpha = 0.25) +
     theme_bw() +
     theme(panel.grid = element_blank(),
       legend.position = "bottom")
-    
+
 
 ggplot(s,aes(x=theta1)) +
   geom_density(color="#585858", fill="#585858", alpha=.5) +
@@ -305,11 +305,11 @@ ggplot(s,aes(x=theta1)) +
   geom_segment(aes(x=hdi_anbA$CI_low,xend=hdi_anbA$CI_high,y=0.075,yend=0.075), size = 0.25) +
   annotate(geom="text",x=hdi_anbA$CI_low,y=0.5,label=as.character(round(hdi_anbA$CI_low,2))) +
   annotate(geom="text",x=hdi_anbA$CI_high,y=0.5,label=as.character(round(hdi_anbA$CI_high,2))) +
-  scale_y_continuous(expand = c(0,0),limits = c(0,16), breaks = seq(0,15,5)) + 
+  scale_y_continuous(expand = c(0,0),limits = c(0,16), breaks = seq(0,15,5)) +
   xlab("Anteil pos. Bewertungen für Anbieter A") +
   ylab("Dichte") +
   theme_bw() +
-    theme(panel.grid = element_blank()) 
+    theme(panel.grid = element_blank())
 
 ggplot(s,aes(x=theta2)) +
   geom_density(color="#585858", fill="#585858", alpha=.5) +
@@ -317,7 +317,7 @@ ggplot(s,aes(x=theta2)) +
   geom_segment(aes(x=hdi_anbB$CI_low,xend=hdi_anbB$CI_high,y=0.075,yend=0.075), size = 0.25) +
   annotate(geom="text",x=hdi_anbB$CI_low,y=0.135,label=as.character(round(hdi_anbB$CI_low,2))) +
   annotate(geom="text",x=hdi_anbB$CI_high,y=0.135,label=as.character(round(hdi_anbB$CI_high,2))) +
-  scale_y_continuous(expand = c(0,0),limits = c(0,2.95), breaks = seq(0,2.75,0.5)) + 
+  scale_y_continuous(expand = c(0,0),limits = c(0,2.95), breaks = seq(0,2.75,0.5)) +
   scale_x_continuous(breaks = seq(0,1,0.1)) +
   xlab("Anteil pos. Bewertungen für Anbieter B") +
   ylab("Dichte") +
@@ -331,7 +331,7 @@ ggplot(s,aes(x=diff)) +
   annotate(geom="text",x=hdi_diff$CI_low,y=0.1,label=as.character(round(hdi_diff$CI_low,2))) +
   annotate(geom="text",x=hdi_diff$CI_high,y=0.1,label=as.character(round(hdi_diff$CI_high,2))) +
   scale_x_continuous(breaks = seq(-0.2,0.9,0.1), limits = c(-0.25,0.95)) +
-  scale_y_continuous(expand = c(0,0),limits = c(0,2.75), breaks = seq(0,2.5,0.5)) +  
+  scale_y_continuous(expand = c(0,0),limits = c(0,2.75), breaks = seq(0,2.5,0.5)) +
   xlab("Differenz im Anteil pos. Bewertungen (Anb.A - Anb. B)") +
   ylab("Dichte") +
   theme_bw() +
