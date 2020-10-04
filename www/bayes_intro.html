@@ -1,0 +1,19 @@
+<p>
+  Die Wahrscheinlichkeit, dass Anbieter A zuverlässiger ist und daher systematisch besser bewertet wird als Anbieter B, lässt sich am direktesten über einen bayesianischen Schätzer berechnen. <strong>Die Schätzung ergibt eine Wahrscheinlichkeit von rund 71 Prozent, dass Anbieter A besser bewertet wird. Allerdings ist die Schätzung ungenau und es lässt sich nicht ausschliessen, dass eigentlich gar kein Unterschied zwischen den Anbietern besteht.</strong>
+</p>
+
+<p>
+  Ich verwende hier einen bayesianischen Schätzer, weil damit wirklich direkt die Wahrscheinlichkeit berechnet werden kann, dass Anbieter A <i>besser</i> bewertet wird als Anbieter B. Ein klassischer ('frequentistischer') Schätzer wie der exakte Test nach Fisher würde dagegen nur testen, ob anhand der Daten ausgeschlossen werden kann, dass eigentlich kein Unterschied in den Bewertungen vorliegt.
+</p>
+
+<p>
+  Für den Test verwende ich den <code>bayes.prop.test()</code> Algorithmus in <code>R</code>. Vereinfacht dargestellt schätzt dieser über eine Simulation, welchen Anteil an positiven Bewertungen jeder Anbieter wirklich erhält und wie stark sich die Anteile zwischen den beiden Anbietern unterscheiden. Die Simulation generiert dabei eine Verteilung von Schätzwerten, und in dieser Verteilung sind plausible Werte häufiger vertreten als weniger plausible. Wenn dann Anbieter A in den simulierten Daten deutlich häufiger positive Bewertungen erhält, dann wäre dies ein Zeichen, dass Anbieter A auch in der Realität besser bewertet wird. </p>
+
+<p>
+  (Genauer gesagt werden die Schätzwerte ausgehend von den ursprünglichen Daten und unter Anwendung von Bayes' Regel über eine Markov Chain Monte Carlo Simulation generiert. Siehe auch <a target='_blank' href='http://www.sumsar.net/blog/2014/06/bayesian-first-aid-prop-test/'> Bååth 2014</a>; <a target='blank'
+  href='https://jkkweb.sitehost.iu.edu/articles/Kruschke2013JEPG.pdf'>Kruschke 2013</a>. Die a-priori Verteilung ist hier die uninformative Beta-Verteilung (Beta(1,1)), wie bei der bayesianischen Schätzung von Anteilswerten üblich).
+</p>
+
+  <p>
+  Die Schätzung kann über den Button unten gestartet werden.
+  </p>

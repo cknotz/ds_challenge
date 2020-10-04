@@ -265,7 +265,7 @@ girafe(ggobj = p,
 
 (88/100)-(0/2)
 
-fisher.test(rbind(c(90,10),c(2,0)), alternative="two.sided")
+fisher.test(rbind(c(90,10),c(2,0)), alternative="less")
 
 # by hand:
 one <- (factorial(90+10)*factorial(2+0)*factorial(90+2)*factorial(10+0)) /
@@ -297,25 +297,61 @@ bayes.prop.test(no_pos,no_eval)
 fit <- bayes.prop.test(no_pos,no_eval)
 
 summary(fit)
-plot(fit)
 
 s <- as.data.frame(fit)
 s$diff <- s$theta1-s$theta2
 
-  hdi_diff <- bayestestR::ci(diff, method="HDI",ci=0.95)
+  hdi_diff <- bayestestR::ci(s$diff, method="HDI",ci=0.95)
   
   hdi_anbA <- bayestestR::ci(s$theta1, method="HDI",ci=0.95)
   
   hdi_anbB <- bayestestR::ci(s$theta2, method="HDI",ci=0.95)
 
-  mean(diff>0)
-  mean(diff<0)  
+  mean(s$diff>0)
+  mean(s$diff<0)  
+  
+  
+  # ROPE
+  mean(abs((s$theta1 - s$theta2)) < 0.025)
+
+s %>% 
+  select(theta1, theta2) %>% 
+  pivot_longer(cols = everything(),
+               values_to="theta",
+               names_to = "type") %>% 
+  ggplot(aes(x=theta, fill = type)) +
+    geom_density(alpha = 0.25) +
+    theme_bw() +
+    theme(panel.grid = element_blank(),
+      legend.position = "bottom")
+    
+
+
 
 ggplot(s,aes(x=theta1)) +
-  geom_histogram()  
+  geom_density(color="#585858", fill="#585858", alpha=.5) +
+  geom_vline(xintercept = median(s$theta1), linetype="dashed", size=0.25) +
+  geom_segment(aes(x=hdi_anbA$CI_low,xend=hdi_anbA$CI_high,y=0.075,yend=0.075), size = 0.25) +
+  annotate(geom="text",x=hdi_anbA$CI_low,y=0.5,label=as.character(round(hdi_anbA$CI_low,2))) +
+  annotate(geom="text",x=hdi_anbA$CI_high,y=0.5,label=as.character(round(hdi_anbA$CI_high,2))) +
+  scale_y_continuous(expand = c(0,0),limits = c(0,16), breaks = seq(0,15,5)) + 
+  xlab("Anteil pos. Bewertungen für Anbieter A") +
+  ylab("Dichte") +
+  theme_bw() +
+    theme(panel.grid = element_blank()) 
 
 ggplot(s,aes(x=theta2)) +
-  geom_density()
+  geom_density(color="#585858", fill="#585858", alpha=.5) +
+  geom_vline(xintercept = median(s$theta2), linetype="dashed", size=0.25) +
+  geom_segment(aes(x=hdi_anbB$CI_low,xend=hdi_anbB$CI_high,y=0.075,yend=0.075), size = 0.25) +
+  annotate(geom="text",x=hdi_anbB$CI_low,y=0.135,label=as.character(round(hdi_anbB$CI_low,2))) +
+  annotate(geom="text",x=hdi_anbB$CI_high,y=0.135,label=as.character(round(hdi_anbB$CI_high,2))) +
+  scale_y_continuous(expand = c(0,0),limits = c(0,2.95), breaks = seq(0,2.75,0.5)) + 
+  scale_x_continuous(breaks = seq(0,1,0.1)) +
+  xlab("Anteil pos. Bewertungen für Anbieter B") +
+  ylab("Dichte") +
+  theme_bw() +
+    theme(panel.grid = element_blank())
 
 ggplot(s,aes(x=diff)) +
   geom_density(color="#c2224a", fill="#c2224a", alpha=.5) +
@@ -323,7 +359,7 @@ ggplot(s,aes(x=diff)) +
   geom_segment(aes(x=hdi_diff$CI_low,xend=hdi_diff$CI_high,y=0.02,yend=0.02), size = 0.25) +
   annotate(geom="text",x=hdi_diff$CI_low,y=0.1,label=as.character(round(hdi_diff$CI_low,2))) +
   annotate(geom="text",x=hdi_diff$CI_high,y=0.1,label=as.character(round(hdi_diff$CI_high,2))) +
-  scale_x_continuous(breaks = seq(-.2,0.9,0.1)) +
+  scale_x_continuous(breaks = seq(-0.2,0.9,0.1), limits = c(-0.25,0.95)) +
   scale_y_continuous(expand = c(0,0),limits = c(0,2.75), breaks = seq(0,2.5,0.5)) +  
   xlab("Differenz im Anteil pos. Bewertungen (Anb.A - Anb. B)") +
   ylab("Dichte") +
