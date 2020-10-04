@@ -9,6 +9,7 @@ library(tidyverse)
 library(ggiraph)
 library(countrycode)
 library(BayesianFirstAid)
+library(bayestestR)
 
 # Number of medals
 ##################
