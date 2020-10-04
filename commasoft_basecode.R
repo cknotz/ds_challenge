@@ -256,36 +256,8 @@ girafe(ggobj = p,
 
 
 
-# Aufg 3 (Randomization test/Fisher exact test)
-###############################################
-
-(90/100)-(2/2)
-
-(89/100)-(1/2)
-
-(88/100)-(0/2)
-
-fisher.test(rbind(c(90,10),c(2,0)), alternative="less")
-
-# by hand:
-one <- (factorial(90+10)*factorial(2+0)*factorial(90+2)*factorial(10+0)) /
-    (factorial(102)*factorial(90)*factorial(2)*factorial(10)*factorial(0)) # observed
-
-two <- (factorial(91+9)*factorial(1+1)*factorial(91+1)*factorial(9+1)) /
-    (factorial(102)*factorial(91)*factorial(1)*factorial(9)*factorial(1)) # one more extreme
-
-three <- (factorial(92+8)*factorial(0+2)*factorial(92+0)*factorial(8+2)) /
-    (factorial(102)*factorial(92)*factorial(0)*factorial(8)*factorial(2)) # one more extreme
-
-one+two+three # one sided, also two-sided (R sums probs of all tables with probs <= to observed; here: all!)
-
-one # one-sided, other direction?
-
-two+three
-
-
-# Bayesian
-##########
+# Aufg 3 Bayesian simulation
+############################
 
 set.seed(42)
 
@@ -326,8 +298,6 @@ s %>%
       legend.position = "bottom")
     
 
-
-
 ggplot(s,aes(x=theta1)) +
   geom_density(color="#585858", fill="#585858", alpha=.5) +
   geom_vline(xintercept = median(s$theta1), linetype="dashed", size=0.25) +
@@ -365,78 +335,3 @@ ggplot(s,aes(x=diff)) +
   ylab("Dichte") +
   theme_bw() +
     theme(panel.grid = element_blank())
-  
-
-
-# Simulation I 
-##############
-
-# Generate data.frame
-df <- data.frame(anb = c(replicate(100, "Anbieter A"),replicate(2, "Anbieter B")),
-                 eval = c(c(replicate(90,1),replicate(10,0)),c(1,1)))
-
-table(df$anb,df$eval)
-
-# Storing proportions
-sum <- df %>% 
-  group_by(anb) %>% 
-  summarize(positive = mean(eval == 1),
-    sample_size = n())
-
-phat_A <- sum$positive[1]
-phat_B <- sum$positive[2]
-n_A <- sum$sample_size[1]
-n_B <- sum$sample_size[2]
-obs_diff <- phat_A - phat_B
-
-# Shuffling
-set.seed(17)
-
-shuffles <- mosaic::do(1000) *
-    (df %>% 
-         mutate(anb = mosaic::shuffle(anb)) %>% 
-         group_by(anb) %>% 
-         summarize(positive = mean(eval == 1)))
-
-ggplot(shuffles, aes(x=anb,y=positive)) +
-    geom_jitter(alpha=.2, width = 0.25, size = 2,color = "#c2224a") +
-    scale_y_continuous(breaks = seq(0,1,.1)) +
-    ylab("Anteil positive Bewertungen") +
-    xlab("") +
-    theme_bw() +
-    theme(legend.position = "bottom",
-          legend.title = element_blank(),
-          panel.grid.major.x = element_line(color = "gray", size = .2),
-          panel.grid.major.y = element_blank())
-
-
-null_dist <- shuffles %>% 
-    group_by(.index) %>% 
-    summarize(diff = -diff(positive)) # negative of difference to obtain same sign as diff A-B
-
-ggplot(null_dist, aes(x = diff)) +
-  geom_histogram(color = "white", fill = "#c2224a") +
-    scale_y_continuous(labels = function(x){x/1000},
-                       expand = c(0, 0),
-                       limits = c(0,1000),
-                       breaks = seq(0,1000,200)) +
-    scale_x_continuous(breaks = seq(-0.2,1,.1)) +
-    theme_bw() +
-    theme(legend.position = "bottom",
-          legend.title = element_blank(),
-          panel.grid.major.x = element_line(color = "gray", size = .2),
-          panel.grid.major.y = element_blank())
-
-sum(round(null_dist$diff,2)>0)/1000
-
-sum(round(null_dist$diff,2)<=0)/1000
-
-# Compute p-value
-pvalue <- null_dist %>%
-  filter( (round(diff,2) > obs_diff) ) %>%
-  nrow() / nrow(null_dist)
-pvalue
-
-
-
-
