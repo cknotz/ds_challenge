@@ -48,9 +48,8 @@ ui <- dashboardPage(
                                die ersten 75 Länder aus 207, um das Schaubild lesbar zu halten.</li>
                                <li>Der Code, um die Daten von Wikipedia einzulesen sowie der Code für dieses Dashbord (inkl. der bayesianischen Schätzung für Aufg. 2) sind auf
                                meinem <a href='https://github.com/cknotz/ds_challenge' target='_blank'>Github Profil</a> hinterlegt.</li>
-                               <li>Bei den Antworten auf Frage 3 beziehe ich mich u.a. auf zwei Studien zu Predictive Maintenance
-                               Praktiken von PricewaterhouseCoopers (<a target='_blank href='https://www.pwc.nl/nl/assets/documents/pwc-predictive-maintenance-4-0.pdf'>2017</a>; <a target='_blank'
-                               href='https://www.mainnovation.com/wp-content/uploads/tmp/6397245268d8d3711c88cda0b4585ab02e612f2e.pdf'>2018</a>).
+                               <li>Bei den Antworten auf Frage 3 beziehe ich mich u.a. auf eine Studie zu Predictive Maintenance
+                               Praktiken von PricewaterhouseCoopers (<a target='_blank' href='https://www.pwc.nl/nl/assets/documents/pwc-predictive-maintenance-4-0.pdf'>2017</a>).
                                </li>
                                </ul>
                                Mir hat die Challenge viel Spaß gemacht und ich hoffe natürlich, dass Sie meine Antworten überzeugen.
